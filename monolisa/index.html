@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1c1917" />
+<title>Moly</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Mono Lisa","short_name":"Mono Lisa","start_url":".","display":"standalone","background_color":"%231c1917","theme_color":"%231c1917","icons":[]}' />
+<style>
+  :root { font-family: system-ui, -apple-system, sans-serif; background:#1c1917; color:#f5f5f4; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; min-height:100vh; padding:16px; max-width:640px; margin-inline:auto; }
+  h1 { font-size:1.3rem; margin:0 0 4px; letter-spacing:.5px; }
+  .sub { color:#a8a29e; font-size:.85rem; margin-bottom:16px; }
+  .card { background:#292524; border-radius:14px; padding:16px; margin-bottom:12px; }
+  input, button { font:inherit; }
+  input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #57534e; background:#1c1917; color:#f5f5f4; margin-bottom:8px; }
+  button { cursor:pointer; border:none; border-radius:10px; padding:10px 14px; background:#78716c; color:#fff; }
+  button.primary { background:#f59e0b; color:#1c1917; font-weight:600; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .controls { display:flex; align-items:center; justify-content:center; gap:18px; margin:8px 0; }
+  .ctrl { font-size:1.6rem; background:transparent; padding:8px; }
+  .ctrl.big { font-size:2.4rem; }
+  #now { text-align:center; }
+  #now .t { font-weight:600; }
+  #now .f { color:#a8a29e; font-size:.85rem; }
+  input[type=range] { width:100%; accent-color:#f59e0b; }
+  .list { max-height:38vh; overflow:auto; }
+  .track { padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; }
+  .track:hover { background:#3f3a36; }
+  .track.active { background:#44403c; color:#f59e0b; }
+  .balloon { font-size:1.4rem; background:transparent; }
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; padding:16px; z-index:10; }
+  .sheet { background:#292524; border-radius:14px; padding:16px; width:100%; max-width:420px; max-height:80vh; overflow:auto; }
+  .comment { padding:6px 8px; border-radius:8px; font-size:.9rem; }
+  .comment .ts { color:#f59e0b; font-weight:600; margin-right:6px; font-variant-numeric:tabular-nums; }
+  .comment.hl { background:#44403c; outline:2px solid #f59e0b; }
+  .hidden { display:none; }
+  .msg { font-size:.8rem; padding:4px 8px; border-radius:6px; margin-top:6px; }
+  .msg.ok { background:#064e3b; color:#6ee7b7; }
+  .msg.err { background:#7f1d1d; color:#fca5a5; }
+  details summary { cursor:pointer; color:#a8a29e; margin-bottom:8px; }
+  .nav { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .playlist-name { font-weight:600; text-align:center; overflow-wrap:anywhere; }
+  .tag { font-size:.65rem; vertical-align:super; color:#a8a29e; }
+  .tag.priv { color:#f59e0b; }
+</style>
+</head>
+<body>
+  <h1>🎨 Moly</h1>
+  <div class="sub" id="tenantName">Muziekspeler voor Google Drive-mappen</div>
+
+  <div class="card" id="setup">
+    <details open id="setupDetails">
+      <summary>Instellingen</summary>
+      <label>Privé-map (alleen na Google-inloggen; delen met specifieke personen)</label>
+      <input id="folderUrl" placeholder="https://drive.google.com/drive/folders/... (Mixes)" />
+      <label>Publieke map (iedereen met de link – Lezer, geen inloggen nodig)</label>
+      <input id="publicFolderUrl" placeholder="https://drive.google.com/drive/folders/... (MixesPub) — mag leeg" />
+      <label>Google API-key (voor de publieke map)</label>
+      <input id="apiKey" placeholder="AIza..." />
+      <label>OAuth Client-ID (voor inloggen, privé-map en opmerkingen)</label>
+      <input id="clientId" placeholder="xxxxx.apps.googleusercontent.com" />
+      <div class="row">
+        <button class="primary" id="btnStart">Laden &amp; afspelen</button>
+        <button id="btnRandom">🎲 Willekeurig</button>
+      </div>
+      <div id="setupMsg" class="msg hidden"></div>
+    </details>
+  </div>
+
+  <div class="card hidden" id="playerCard">
+    <div class="nav">
+      <button id="btnPrevList" title="Vorige map">⏮ Vorige</button>
+      <div class="playlist-name" id="listName">—</div>
+      <button id="btnNextList" title="Volgende map">Volgende ⏭</button>
+    </div>
+    <div id="now" style="margin-top:12px">
+      <div class="t" id="trackName">—</div>
+      <div class="f" id="trackPos">0:00 / 0:00</div>
+    </div>
+    <input type="range" id="seek" min="0" max="100" value="0" />
+    <div class="controls">
+      <button class="ctrl" id="btnBack10">⏪10s</button>
+      <button class="ctrl big" id="btnPlayPause">⏸</button>
+      <button class="ctrl" id="btnFwd10">10s⏩</button>
+      <button class="balloon" id="btnComment" title="Tik = opmerking, vasthouden = overzicht">💬</button>
+    </div>
+    <div class="list" id="trackList"></div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnLogin" class="hidden">🔐 Inloggen voor privé-mappen</button>
+    </div>
+  </div>
+
+  <!-- Opmerking invoeren -->
+  <div class="overlay hidden" id="inputOverlay">
+    <div class="sheet">
+      <h3 style="margin-top:0">Opmerking</h3>
+      <div class="sub" id="inputAt">op 0:00</div>
+      <input id="commentText" placeholder="Jouw opmerking op dit moment..." />
+      <div class="row">
+        <button class="primary" id="btnSaveComment">Opslaan</button>
+        <button id="btnCancelComment">Annuleren</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Opmerkingen overzicht -->
+  <div class="overlay hidden" id="listOverlay">
+    <div class="sheet">
+      <h3 style="margin-top:0">Opmerkingen <span class="sub" id="listCount"></span></h3>
+      <div id="commentList"></div>
+      <button id="btnCloseList" style="margin-top:10px">Sluiten</button>
+    </div>
+  </div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+
+/* ============================================================
+   CONFIG — vul hier later je eigen waarden in (tussen de quotes)
+   Laat leeg ("") om het invoerveld in de app te laten bepalen.
+   ============================================================ */
+const CONFIG = {
+  tenant:           "Mono Lisa",
+  folderUrl:        "https://drive.google.com/drive/folders/1ZRtriefc0mwkHHtKxWTmTrQnQs3DHPq0",
+  publicFolderUrl:  "https://drive.google.com/drive/folders/1nxTjGqAdec-XN1sBe4S6AfpPYQUSGXCF",
+  apiKey:           "AIzaSyCtyBR39w4_5-gVkl7ytSyZ2Hf1fHEOYb0",
+  clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
+};
+
+/* Toon tenantnaam (of standaardtekst) zodra de pagina laadt */
+(function () {
+  const t = CONFIG.tenant && !CONFIG.tenant.startsWith("HIER-JOUW-") ? CONFIG.tenant : "";
+  if (t) $("tenantName").textContent = t;
+})();
+
+const state = {
+  apiKey: "", clientId: "",
+  privRoot: null, pubRoot: null,
+  folders: [], folderIdx: -1,        // elke map: {id, name, origin: "priv"|"pub"}
+  files: [], fileIdx: -1,
+  comments: [], commentsFileId: null,
+  token: null,
+};
+const audio = new Audio();
+audio.preload = "auto";
+
+/* ---------- Setup / opslag ---------- */
+for (const [k, id, cfg] of [
+  ["mlFolder","folderUrl","folderUrl"],
+  ["mlPubFolder","publicFolderUrl","publicFolderUrl"],
+  ["mlKey","apiKey","apiKey"],
+  ["mlClient","clientId","clientId"],
+]) {
+  const cfgVal = CONFIG[cfg] && !CONFIG[cfg].startsWith("HIER-JOUW-") ? CONFIG[cfg] : "";
+  const v = localStorage.getItem(k) || cfgVal; if (v) $(id).value = v;
+}
+$("btnStart").addEventListener("click", start);
+$("btnRandom").addEventListener("click", async () => {
+  if (!state.folders.length) return start();
+  const idx = Math.floor(Math.random() * state.folders.length);
+  await loadFolder(idx, Math.floor(Math.random() * 1000));
+});
+$("btnLogin").addEventListener("click", async () => {
+  try {
+    state.token = await getToken();
+    $("btnLogin").classList.add("hidden");
+    await loadFolderList(); // privé-mappen erbij
+    await loadFolder(0);
+  } catch (e) { msg("Inloggen mislukt: " + e.message, false); }
+});
+
+function saveSetup() {
+  localStorage.setItem("mlFolder", $("folderUrl").value);
+  localStorage.setItem("mlPubFolder", $("publicFolderUrl").value);
+  localStorage.setItem("mlKey", $("apiKey").value);
+  localStorage.setItem("mlClient", $("clientId").value);
+}
+function msg(text, ok) {
+  const m = $("setupMsg");
+  m.textContent = text; m.className = "msg " + (ok ? "ok" : "err");
+}
+
+/* ---------- Drive helpers ---------- */
+function parseFolderId(s) {
+  s = (s || "").trim();
+  if (!s) return null;
+  const m = s.match(/folders\/([a-zA-Z0-9_-]+)/) || s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : (/^[a-zA-Z0-9_-]{20,}$/.test(s) ? s : null);
+}
+async function driveGet(path, origin) {
+  const headers = {};
+  let url = "https://www.googleapis.com/drive/v3/" + path;
+  if (origin === "priv") {
+    if (!state.token) throw new Error("Niet ingelogd");
+    headers["Authorization"] = "Bearer " + state.token;
+  } else {
+    if (!state.apiKey) throw new Error("Geen API-key ingesteld");
+    url += (path.includes("?") ? "&" : "?") + "key=" + state.apiKey;
+  }
+  const r = await fetch(url, { headers });
+  if (!r.ok) throw new Error("Drive fout " + r.status + ": " + (await r.text()).slice(0, 200));
+  return r.json();
+}
+async function listChildren(folderId, q, origin, orderBy) {
+  const params = "q=" + encodeURIComponent(q.replace("PARENT", folderId)) +
+    "&fields=files(id,name,modifiedTime,mimeType)&pageSize=200" +
+    (orderBy ? "&orderBy=" + encodeURIComponent(orderBy) : "");
+  const res = await driveGet("files?" + params, origin);
+  return res.files || [];
+}
+
+/* ---------- Start ---------- */
+async function start() {
+  saveSetup();
+  state.apiKey = $("apiKey").value.trim();
+  state.clientId = $("clientId").value.trim();
+  state.privRoot = parseFolderId($("folderUrl").value);
+  state.pubRoot = parseFolderId($("publicFolderUrl").value);
+  if (!state.privRoot && !state.pubRoot) return msg("Vul minstens één map-URL in.", false);
+  if (state.pubRoot && !state.apiKey) return msg("Voor de publieke map is een API-key nodig.", false);
+  if (state.privRoot && !state.clientId) return msg("Voor de privé-map is een OAuth Client-ID nodig (inloggen).", false);
+
+  try {
+    // Probeeren al ingelogd? Token in sessie checken is niet nodig; we vragen alleen bij klikken op Inloggen.
+    await loadFolderList();
+    if (!state.folders.length) {
+      if (state.privRoot && !state.token) {
+        msg("De privé-map verschijnt na het inloggen.", true);
+        $("setupDetails").open = false;
+        $("playerCard").classList.remove("hidden");
+        $("btnLogin").classList.remove("hidden");
+        return;
+      }
+      throw new Error("Geen speelbare mappen gevonden.");
+    }
+    msg("Geladen: " + state.folders.length + " map(pen).", true);
+    $("setupDetails").open = false;
+    $("playerCard").classList.remove("hidden");
+    if (state.privRoot && !state.token) $("btnLogin").classList.remove("hidden");
+    await loadFolder(0);
+  } catch (e) { msg(e.message, false); }
+}
+
+async function loadFolderList() {
+  const all = [];
+  // Publieke mappen (geen login)
+  if (state.pubRoot) {
+    let pubs = await listChildren(state.pubRoot,
+      "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+      "pub", "modifiedTime desc");
+    if (!pubs.length) pubs = [{ id: state.pubRoot, name: "MixesPub", modifiedTime: new Date().toISOString() }];
+    pubs.forEach((f) => all.push({ ...f, origin: "pub" }));
+  }
+  // Privé-mappen (alleen met token)
+  if (state.privRoot && state.token) {
+    let privs = await listChildren(state.privRoot,
+      "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+      "priv", "modifiedTime desc");
+    if (!privs.length) privs = [{ id: state.privRoot, name: "Mixes", modifiedTime: new Date().toISOString() }];
+    privs.forEach((f) => all.push({ ...f, origin: "priv" }));
+  }
+  state.folders = all; // nieuwste eerst (API sorteert al per bron)
+}
+
+/* ---------- Speellijst (map) laden ---------- */
+async function loadFolder(idx, startAt) {
+  if (!state.folders.length) return;
+  state.folderIdx = ((idx % state.folders.length) + state.folders.length) % state.folders.length;
+  const folder = state.folders[state.folderIdx];
+  $("listName").innerHTML = folder.name +
+    (folder.origin === "priv" ? " <span class='tag priv'>🔒</span>" : " <span class='tag'>🌐</span>");
+  state.files = (await listChildren(folder.id,
+    "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
+    folder.origin))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  renderTrackList();
+  await loadComments(folder);
+  if (state.files.length) await playTrack(startAt != null && startAt < state.files.length ? startAt : 0);
+}
+
+function renderTrackList() {
+  const el = $("trackList"); el.innerHTML = "";
+  state.files.forEach((f, i) => {
+    const d = document.createElement("div");
+    d.className = "track" + (i === state.fileIdx ? " active" : "");
+    d.innerHTML = "<span>" + f.name.replace(/\.[^.]+$/, "") + "</span>";
+    d.onclick = () => playTrack(i);
+    el.appendChild(d);
+  });
+}
+
+/* ---------- Audio (download als blob zodat OAuth-headers meekunnen) ---------- */
+async function playTrack(i) {
+  const f = state.files[i]; if (!f) return;
+  const folder = state.folders[state.folderIdx];
+  state.fileIdx = i; renderTrackList();
+  $("trackName").textContent = f.name.replace(/\.[^.]+$/, "");
+  try {
+    const url = await fetchAudioUrl(f.id, folder.origin);
+    audio.src = url;
+    await audio.play();
+    $("btnPlayPause").textContent = "⏸";
+  } catch (e) {
+    $("btnPlayPause").textContent = "▶";
+    msg("Kan nummer niet laden (" + (e.message || e) + ").", false);
+  }
+}
+async function fetchAudioUrl(fileId, origin) {
+  const headers = {};
+  let url = "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media";
+  if (origin === "priv") {
+    if (!state.token) throw new Error("niet ingelogd");
+    headers["Authorization"] = "Bearer " + state.token;
+  } else {
+    url += "&key=" + state.apiKey;
+  }
+  const r = await fetch(url, { headers });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  const blob = await r.blob();
+  if (blob.size < 1024) throw new Error("bestand te klein / geen toegang");
+  return URL.createObjectURL(blob);
+}
+audio.addEventListener("ended", () => {
+  if (state.fileIdx < state.files.length - 1) playTrack(state.fileIdx + 1);
+  else if (state.folderIdx < state.folders.length - 1) loadFolder(state.folderIdx + 1);
+});
+audio.addEventListener("timeupdate", () => {
+  const fmt = (s) => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+  $("trackPos").textContent = fmt(audio.currentTime) + " / " + (isFinite(audio.duration) ? fmt(audio.duration) : "–:––");
+  if (isFinite(audio.duration)) $("seek").value = (audio.currentTime / audio.duration) * 100;
+});
+$("seek").addEventListener("input", (e) => {
+  if (isFinite(audio.duration)) audio.currentTime = (e.target.value / 100) * audio.duration;
+});
+$("btnPlayPause").addEventListener("click", () => {
+  if (audio.paused) { audio.play(); $("btnPlayPause").textContent = "⏸"; }
+  else { audio.pause(); $("btnPlayPause").textContent = "▶"; }
+});
+$("btnBack10").addEventListener("click", () => audio.currentTime = Math.max(0, audio.currentTime - 10));
+$("btnFwd10").addEventListener("click", () => audio.currentTime = Math.min(audio.duration || 1e9, audio.currentTime + 10));
+$("btnPrevList").addEventListener("click", () => loadFolder(state.folderIdx - 1));
+$("btnNextList").addEventListener("click", () => loadFolder(state.folderIdx + 1));
+
+/* ---------- Opmerkingen ---------- */
+const MD_NAME = "opmerkingen.md";
+async function loadComments(folder) {
+  state.comments = []; state.commentsFileId = null;
+  try {
+    const files = await listChildren(folder.id, "'PARENT' in parents and name='" + MD_NAME + "'", folder.origin);
+    if (files.length) {
+      state.commentsFileId = files[0].id;
+      const txt = await fetchFileText(files[0].id, folder.origin);
+      state.comments = parseComments(txt);
+    }
+  } catch (e) { /* nog geen opmerkingenbestand */ }
+  const local = localStorage.getItem("mlComments_" + folder.id);
+  if (local && !state.commentsFileId) state.comments = parseComments(local);
+  renderComments(null);
+}
+async function fetchFileText(fileId, origin) {
+  const headers = {};
+  let url = "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media";
+  if (origin === "priv") { headers["Authorization"] = "Bearer " + state.token; }
+  else { url += "&key=" + state.apiKey; }
+  return (await fetch(url, { headers })).text();
+}
+function parseComments(md) {
+  const out = [];
+  for (const line of md.split(/\r?\n/)) {
+    const m = line.match(/^\s*[-*]\s*\[(\d+):(\d+)\]\s*(.*)$/);
+    if (m) out.push({ sec: parseInt(m[1]) * 60 + parseInt(m[2]), text: m[3].trim() });
+  }
+  return out.sort((a, b) => a.sec - b.sec);
+}
+function fmtTime(s) { return Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0"); }
+function commentsAsMd() {
+  return state.comments.map((c) => "- [" + fmtTime(c.sec) + "] " + c.text).join("\n") + "\n";
+}
+function renderComments(currentSec) {
+  const wrap = $("commentList"); wrap.innerHTML = "";
+  $("listCount").textContent = "(" + state.comments.length + ")";
+  let hlIdx = -1;
+  if (currentSec != null) state.comments.forEach((c, i) => { if (c.sec <= currentSec) hlIdx = i; });
+  state.comments.forEach((c, i) => {
+    const d = document.createElement("div");
+    d.className = "comment" + (i === hlIdx ? " hl" : "");
+    d.innerHTML = "<span class='ts'>[" + fmtTime(c.sec) + "]</span>" + c.text.replace(/[<>&]/g, (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[ch]));
+    wrap.appendChild(d);
+  });
+  if (!state.comments.length) wrap.innerHTML = "<div class='sub'>Nog geen opmerkingen in deze map.</div>";
+}
+
+/* Tekstballon: tik = invoeren, vasthouden = overzicht */
+let holdTimer = null, held = false;
+const balloon = $("btnComment");
+balloon.addEventListener("pointerdown", () => {
+  held = false;
+  holdTimer = setTimeout(() => { held = true; openCommentList(); }, 450);
+});
+["pointerup", "pointerleave"].forEach((ev) => balloon.addEventListener(ev, () => clearTimeout(holdTimer)));
+balloon.addEventListener("click", () => { if (!held) openCommentInput(); });
+
+function openCommentInput() {
+  if (!audio.src) return;
+  $("inputAt").textContent = "op " + fmtTime(audio.currentTime) + " in " + $("trackName").textContent;
+  $("commentText").value = "";
+  $("inputOverlay").classList.remove("hidden");
+  setTimeout(() => $("commentText").focus(), 50);
+}
+function openCommentList() {
+  renderComments(audio.currentTime || null);
+  $("listOverlay").classList.remove("hidden");
+}
+$("btnCancelComment").addEventListener("click", () => $("inputOverlay").classList.add("hidden"));
+$("btnCloseList").addEventListener("click", () => $("listOverlay").classList.add("hidden"));
+[$("inputOverlay"), $("listOverlay")].forEach((ov) => ov.addEventListener("click", (e) => { if (e.target === ov) ov.classList.add("hidden"); }));
+
+$("btnSaveComment").addEventListener("click", saveComment);
+$("commentText").addEventListener("keydown", (e) => { if (e.key === "Enter") saveComment(); });
+
+async function saveComment() {
+  const text = $("commentText").value.trim();
+  if (!text) return $("inputOverlay").classList.add("hidden");
+  const folder = state.folders[state.folderIdx];
+  state.comments.push({ sec: Math.floor(audio.currentTime), text });
+  state.comments.sort((a, b) => a.sec - b.sec);
+  $("inputOverlay").classList.add("hidden");
+  renderComments(audio.currentTime);
+  if (!state.token) {
+    alert("Voor het opslaan van opmerkingen in Drive moet je eerst inloggen (knop onderaan).\nDe opmerking blijft nu alleen op dit apparaat bewaard.");
+  }
+  await persistComments(folder);
+}
+async function persistComments(folder) {
+  const md = commentsAsMd();
+  if (!state.token) return localStorage.setItem("mlComments_" + folder.id, md);
+  try {
+    if (!state.commentsFileId) {
+      const meta = await (await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + state.token },
+        body: makeMultipart(md, folder.id),
+      })).json();
+      if (!meta.id) throw new Error("aanmaken mislukt");
+      state.commentsFileId = meta.id;
+    } else {
+      await fetch("https://www.googleapis.com/upload/drive/v3/files/" + state.commentsFileId + "?uploadType=media", {
+        method: "PATCH",
+        headers: { Authorization: "Bearer " + state.token, "Content-Type": "text/markdown" },
+        body: md,
+      });
+    }
+    localStorage.removeItem("mlComments_" + folder.id);
+  } catch (e) {
+    alert("Opslaan in Drive mislukt (" + (e.message || e) + "). De opmerking blijft alleen lokaal bewaard.");
+    localStorage.setItem("mlComments_" + folder.id, md);
+  }
+}
+function makeMultipart(md, folderId) {
+  const boundary = "ml" + Date.now();
+  const head = "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" +
+    JSON.stringify({ name: MD_NAME, mimeType: "text/markdown", parents: [folderId] }) +
+    "\r\n--" + boundary + "\r\nContent-Type: text/markdown\r\n\r\n";
+  return new Blob([head + md + "\r\n--" + boundary + "--"]);
+}
+
+/* Google Identity Services OAuth */
+let gisPromise = null;
+function getToken() {
+  return new Promise((resolve, reject) => {
+    const use = () => {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: state.clientId,
+        scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file",
+        callback: (r) => r.access_token ? resolve(r.access_token) : reject(new Error("geen token ontvangen")),
+      });
+      client.requestAccessToken();
+    };
+    if (window.google && window.google.accounts && window.google.accounts.oauth2) return use();
+    if (!gisPromise) {
+      gisPromise = new Promise((res, rej) => {
+        const s = document.createElement("script");
+        s.src = "https://accounts.google.com/gsi/client";
+        s.onload = res; s.onerror = () => rej(new Error("Google-login kon niet laden"));
+        document.head.appendChild(s);
+      });
+    }
+    gisPromise.then(use).catch(reject);
+  });
+}
+</script>
+</body>
+</html>
