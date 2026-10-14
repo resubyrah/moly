@@ -1,116 +1,209 @@
 <!doctype html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#1c1917" />
+<meta name="theme-color" content="#22201c" />
 <title>Moly</title>
-<link rel="manifest" href='data:application/manifest+json,{"name":"Mono Lisa","short_name":"Mono Lisa","start_url":".","display":"standalone","background_color":"%231c1917","theme_color":"%231c1917","icons":[]}' />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
+<link rel="manifest" href='data:application/manifest+json,{"name":"Moly","short_name":"Moly","start_url":".","display":"standalone","background_color":"%2322201c","theme_color":"%2322201c","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%2322201c%27/%3E%3Crect x=%276%27 y=%2714%27 width=%2752%27 height=%2736%27 rx=%275%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Crect x=%2714%27 y=%2748%27 width=%2736%27 height=%274%27 rx=%272%27 fill=%27%23241f15%27/%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}' />
 <style>
-  :root { font-family: system-ui, -apple-system, sans-serif; background:#1c1917; color:#f5f5f4; }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin:0; min-height:100vh; padding:16px; max-width:640px; margin-inline:auto; }
-  h1 { font-size:1.3rem; margin:0 0 4px; letter-spacing:.5px; }
-  .sub { color:#a8a29e; font-size:.85rem; margin-bottom:16px; }
-  .card { background:#292524; border-radius:14px; padding:16px; margin-bottom:12px; }
-  input, button { font:inherit; }
-  input { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #57534e; background:#1c1917; color:#f5f5f4; margin-bottom:8px; }
-  button { cursor:pointer; border:none; border-radius:10px; padding:10px 14px; background:#78716c; color:#fff; }
-  button.primary { background:#f59e0b; color:#1c1917; font-weight:600; }
-  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  .controls { display:flex; align-items:center; justify-content:center; gap:18px; margin:8px 0; }
-  .ctrl { font-size:1.6rem; background:transparent; padding:8px; }
-  .ctrl.big { font-size:2.4rem; }
-  #now { text-align:center; }
-  #now .t { font-weight:600; }
-  #now .f { color:#a8a29e; font-size:.85rem; }
-  input[type=range] { width:100%; accent-color:#f59e0b; }
-  .list { max-height:38vh; overflow:auto; }
-  .track { padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; }
-  .track:hover { background:#3f3a36; }
-  .track.active { background:#44403c; color:#f59e0b; }
-  .balloon { font-size:1.4rem; background:transparent; }
-  .overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; padding:16px; z-index:10; }
-  .sheet { background:#292524; border-radius:14px; padding:16px; width:100%; max-width:420px; max-height:80vh; overflow:auto; }
-  .comment { padding:6px 8px; border-radius:8px; font-size:.9rem; }
-  .comment .ts { color:#f59e0b; font-weight:600; margin-right:6px; font-variant-numeric:tabular-nums; }
-  .comment.hl { background:#44403c; outline:2px solid #f59e0b; }
+  :root {
+    font-family: "SF Mono", "Courier New", ui-monospace, monospace;
+    background:#191713; color:#e8e2d4;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; min-height:100vh; padding:16px; max-width:520px; margin-inline:auto;
+         background:linear-gradient(180deg,#191713 0%,#242017 100%); }
+
+  /* ---------- Chrome / deck ---------- */
+  .deck { background:linear-gradient(180deg,#3b3428,#2c271f 60%,#241f18);
+          border:2px solid #4d4433; border-radius:18px; padding:18px 16px 16px;
+          box-shadow:0 10px 24px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,240,200,.18); }
+  .brandbar { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .brand { font-size:1.05rem; letter-spacing:.35em; color:#e8c46a; font-weight:700; text-shadow:0 1px 0 #000; }
+  .brand small { letter-spacing:.12em; color:#a89b7d; font-size:.6rem; display:block; }
+  .settingsbtn { background:none; border:1px solid #6a5c44; color:#cdbf9c; border-radius:6px;
+                 padding:4px 8px; cursor:pointer; font:inherit; font-size:.75rem; }
+  .settingsbtn:active { transform:translateY(1px); }
+
+  /* ---------- Cassette window ---------- */
+  .cassette { background:linear-gradient(180deg,#161310,#0d0b08); border:1px solid #000;
+              border-radius:12px; padding:14px 14px 12px; box-shadow:inset 0 2px 8px #000; }
+  .reels { display:flex; justify-content:center; gap:46px; margin-bottom:8px; }
+  .reel { width:64px; height:64px; border-radius:50%;
+          background:radial-gradient(circle,#c9b98a 0%,#8f7d52 55%,#5c4d31 100%);
+          border:3px solid #2a2318; position:relative; box-shadow:0 2px 6px #000; }
+  .reel::before, .reel::after { content:""; position:absolute; background:#241f15; border-radius:40%; }
+  .reel::before { width:44px; height:5px; left:8px; top:28px; box-shadow:0 12px 0 #241f15, 0 -12px 0 #241f15; }
+  .reel::after { width:5px; height:44px; top:8px; left:28px; box-shadow:12px 0 0 #241f15, -12px 0 0 #241f15; }
+  .spin { animation:spin 3.2s linear infinite; transform-origin:50% 50%; }
+  .paused .reel { animation-play-state:paused; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .tape-label { background:linear-gradient(180deg,#f4ecd7,#e2d6b8); color:#3a3020; border-radius:4px;
+                padding:6px 10px; text-align:center; font-size:.95rem; font-weight:700; letter-spacing:.04em;
+                overflow-wrap:anywhere; margin-bottom:6px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
+  .counter { text-align:center; color:#c46a2b; font-size:.95rem; letter-spacing:.2em; text-shadow:0 0 6px rgba(255,120,30,.55); }
+  .counter .dur { color:#8a7c60; letter-spacing:.05em; text-shadow:none; }
+  input[type=range] { width:100%; accent-color:#e8c46a; margin-top:8px; }
+
+  /* ---------- VU meter ---------- */
+  .vu { display:flex; justify-content:center; gap:10px; margin-top:10px; }
+  .vuch { display:flex; gap:3px; align-items:flex-end; height:44px; padding:5px 7px;
+          background:linear-gradient(180deg,#161310,#0d0b08); border:1px solid #000;
+          border-radius:6px; box-shadow:inset 0 2px 6px #000; }
+  .vuch span { width:5px; height:5px; border-radius:1px; background:#3a2f1a; transition:background .08s, height .08s; }
+  .vuch span.on { background:#e8c46a; }
+  .vuch span:nth-last-child(1).on, .vuch span:nth-last-child(2).on { background:#e06a2b; }
+  .vuch span:nth-last-child(1).on { background:#d94f3d; }
+
+  /* ---------- Transport buttons ---------- */
+  .transport { display:flex; justify-content:center; gap:12px; margin-top:14px; }
+  .tbtn { font:inherit; font-size:.8rem; letter-spacing:.08em; color:#e8e2d4; cursor:pointer;
+          background:linear-gradient(180deg,#57503f,#39332a); border:1px solid #6a5c44;
+          border-radius:8px; padding:12px 14px; min-width:64px; text-align:center;
+          box-shadow:0 4px 0 #191510, inset 0 1px 0 rgba(255,240,200,.22);
+          user-select:none; }
+  .tbtn:active { transform:translateY(3px); box-shadow:0 1px 0 #191510; }
+  .tbtn .glyph { display:block; font-size:1.35rem; line-height:1; margin-bottom:3px; color:#e8c46a; }
+  .tbtn.primary { background:linear-gradient(180deg,#7a5f22,#5c4718); border-color:#a8842e; }
+  .tbtn.balloon-btn { min-width:52px; }
+
+  /* ---------- Playlist / tape select ---------- */
+  .tapebox { margin-top:14px; }
+  .tapenav { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+  .tapenav .name { text-align:center; font-size:.85rem; color:#cdbf9c; letter-spacing:.06em;
+                   overflow-wrap:anywhere; flex:1; }
+  .smallbtn { font:inherit; font-size:.7rem; letter-spacing:.05em; background:#39332a; color:#cdbf9c;
+              border:1px solid #6a5c44; border-radius:6px; padding:5px 9px; cursor:pointer; }
+  .smallbtn:active { transform:translateY(1px); }
+  .list { max-height:34vh; overflow:auto; background:#12100c; border:1px solid #36301f;
+          border-radius:10px; padding:6px; }
+  .track { display:flex; justify-content:space-between; gap:10px; padding:8px 10px; border-radius:6px;
+           cursor:pointer; font-size:.85rem; color:#b8ac91; }
+  .track:hover { background:#241f15; }
+  .track.active { background:#33280f; color:#e8c46a; }
+  .track .len { color:#776b52; font-variant-numeric:tabular-nums; white-space:nowrap; }
   .hidden { display:none; }
-  .msg { font-size:.8rem; padding:4px 8px; border-radius:6px; margin-top:6px; }
-  .msg.ok { background:#064e3b; color:#6ee7b7; }
-  .msg.err { background:#7f1d1d; color:#fca5a5; }
-  details summary { cursor:pointer; color:#a8a29e; margin-bottom:8px; }
-  .nav { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-  .playlist-name { font-weight:600; text-align:center; overflow-wrap:anywhere; }
-  .tag { font-size:.65rem; vertical-align:super; color:#a8a29e; }
-  .tag.priv { color:#f59e0b; }
+
+  /* ---------- Sheets / overlays ---------- */
+  .overlay { position:fixed; inset:0; background:rgba(10,8,5,.7); display:flex;
+             align-items:center; justify-content:center; padding:16px; z-index:10; }
+  .sheet { background:#2c271f; border:1px solid #5c5138; border-radius:14px; padding:16px;
+           width:100%; max-width:400px; max-height:80vh; overflow:auto;
+           box-shadow:0 12px 30px rgba(0,0,0,.6); }
+  .sheet h3 { margin:0 0 8px; color:#e8c46a; letter-spacing:.05em; }
+  .sub { color:#a89b7d; font-size:.8rem; margin-bottom:12px; }
+  input[type=text], input:not([type]) { width:100%; padding:10px 12px; border-radius:8px; margin-bottom:8px;
+          border:1px solid #6a5c44; background:#191510; color:#e8e2d4; font:inherit; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  .btn { font:inherit; cursor:pointer; border:1px solid #6a5c44; background:#57503f; color:#e8e2d4;
+         border-radius:8px; padding:9px 13px; }
+  .btn.primary { background:#e8c46a; color:#241f15; border-color:#a8842e; font-weight:700; }
+  .btn:active { transform:translateY(1px); }
+
+  .comment { padding:6px 8px; border-radius:6px; font-size:.85rem; color:#b8ac91; }
+  .comment .ts { color:#e8c46a; font-weight:700; margin-right:6px; font-variant-numeric:tabular-nums; }
+  .comment.hl { background:#44350f; outline:2px solid #e8c46a; color:#e8e2d4; }
+
+  .msg { font-size:.75rem; padding:5px 8px; border-radius:6px; margin-top:8px; }
+  .msg.ok { background:#2c4a2a; color:#a7d9a0; }
+  .msg.err { background:#5a2222; color:#f0b0a0; }
+  details summary { cursor:pointer; color:#a89b7d; margin-bottom:8px; }
+  label { display:block; font-size:.72rem; color:#a89b7d; letter-spacing:.05em; margin-top:6px; }
 </style>
 </head>
 <body>
-  <h1>🎨 Moly</h1>
-  <div class="sub" id="tenantName">Muziekspeler voor Google Drive-mappen</div>
+  <div class="deck" id="deck">
+    <div class="brandbar">
+      <div class="brand">MOLY<small id="tenantName">compact music system</small></div>
+      <button class="settingsbtn" id="btnSettings" title="Settings">⚙ SETUP</button>
+    </div>
 
-  <div class="card" id="setup">
-    <details open id="setupDetails">
-      <summary>Instellingen</summary>
-      <label>Privé-map (alleen na Google-inloggen; delen met specifieke personen)</label>
+    <div class="cassette">
+      <div class="reels" id="reels">
+        <div class="reel"></div>
+        <div class="reel"></div>
+      </div>
+      <div class="tape-label" id="trackName">—</div>
+      <div class="counter"><span id="trackPos">0:00</span> <span class="dur">/ <span id="trackDur">–:––</span></span></div>
+      <input type="range" id="seek" min="0" max="100" value="0" />
+      <div class="vu" id="vu">
+        <div class="vuch" id="vuL"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="vuch" id="vuR"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="transport">
+      <button class="tbtn" id="btnBack10"><span class="glyph">⏪</span>REW 10</button>
+      <button class="tbtn primary" id="btnPlayPause"><span class="glyph" id="ppGlyph">⏸</span><span id="ppTxt">PAUSE</span></button>
+      <button class="tbtn" id="btnFwd10"><span class="glyph">⏩</span>FWD 10</button>
+      <button class="tbtn balloon-btn" id="btnComment" title="Tap = add note at this moment · Hold = show notes">💬</button>
+    </div>
+
+    <div class="tapebox">
+      <div class="tapenav">
+        <button class="smallbtn" id="btnPrevList">◀ PREV TAPE</button>
+        <div class="name" id="listName">—</div>
+        <button class="smallbtn" id="btnNextList">NEXT TAPE ▶</button>
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <button class="smallbtn" id="btnRandom">🎲 SHUFFLE TAPE &amp; TRACK</button>
+        <button class="smallbtn hidden" id="btnLogin">🔐 LOG IN</button>
+      </div>
+      <div class="list" id="trackList"></div>
+    </div>
+  </div>
+
+  <!-- Settings (hidden by default) -->
+  <div class="sheet hidden" id="setup" style="margin-top:14px">
+    <details id="setupDetails">
+      <summary>Setup</summary>
+      <label>Private folder (sign-in required; share with specific people)</label>
       <input id="folderUrl" placeholder="https://drive.google.com/drive/folders/... (Mixes)" />
-      <label>Publieke map (iedereen met de link – Lezer, geen inloggen nodig)</label>
-      <input id="publicFolderUrl" placeholder="https://drive.google.com/drive/folders/... (MixesPub) — mag leeg" />
-      <label>Google API-key (voor de publieke map)</label>
+      <label>Public folder (anyone with the link — Reader, no sign-in)</label>
+      <input id="publicFolderUrl" placeholder="https://drive.google.com/drive/folders/... (MixesPub) — may be empty" />
+      <label>Google API key (for the public folder)</label>
       <input id="apiKey" placeholder="AIza..." />
-      <label>OAuth Client-ID (voor inloggen, privé-map en opmerkingen)</label>
+      <label>OAuth Client ID (for sign-in, private folder and notes)</label>
       <input id="clientId" placeholder="xxxxx.apps.googleusercontent.com" />
       <div class="row">
-        <button class="primary" id="btnStart">Laden &amp; afspelen</button>
-        <button id="btnRandom">🎲 Willekeurig</button>
+        <button class="btn primary" id="btnStart">LOAD &amp; PLAY</button>
       </div>
       <div id="setupMsg" class="msg hidden"></div>
     </details>
   </div>
 
-  <div class="card hidden" id="playerCard">
-    <div class="nav">
-      <button id="btnPrevList" title="Vorige map">⏮ Vorige</button>
-      <div class="playlist-name" id="listName">—</div>
-      <button id="btnNextList" title="Volgende map">Volgende ⏭</button>
-    </div>
-    <div id="now" style="margin-top:12px">
-      <div class="t" id="trackName">—</div>
-      <div class="f" id="trackPos">0:00 / 0:00</div>
-    </div>
-    <input type="range" id="seek" min="0" max="100" value="0" />
-    <div class="controls">
-      <button class="ctrl" id="btnBack10">⏪10s</button>
-      <button class="ctrl big" id="btnPlayPause">⏸</button>
-      <button class="ctrl" id="btnFwd10">10s⏩</button>
-      <button class="balloon" id="btnComment" title="Tik = opmerking, vasthouden = overzicht">💬</button>
-    </div>
-    <div class="list" id="trackList"></div>
-    <div class="row" style="margin-top:10px">
-      <button id="btnLogin" class="hidden">🔐 Inloggen voor privé-mappen</button>
+  <!-- Sign-in -->
+  <div class="overlay hidden" id="loginOverlay">
+    <div class="sheet" style="text-align:center">
+      <h3>Welcome to <span id="loginTenant">Moly</span></h3>
+      <p class="sub">Sign in to access the private mixes.<br/>Or continue with the public tapes only.</p>
+      <button class="btn primary" id="btnDoLogin" style="width:100%">🔐 Sign in with Google</button>
+      <button class="btn" id="btnPubOnly" style="width:100%; margin-top:8px">🌐 Continue without signing in (public only)</button>
     </div>
   </div>
 
-  <!-- Opmerking invoeren -->
+  <!-- Note input -->
   <div class="overlay hidden" id="inputOverlay">
     <div class="sheet">
-      <h3 style="margin-top:0">Opmerking</h3>
-      <div class="sub" id="inputAt">op 0:00</div>
-      <input id="commentText" placeholder="Jouw opmerking op dit moment..." />
+      <h3>Note</h3>
+      <div class="sub" id="inputAt">at 0:00</div>
+      <input id="commentText" placeholder="Your note at this moment..." />
       <div class="row">
-        <button class="primary" id="btnSaveComment">Opslaan</button>
-        <button id="btnCancelComment">Annuleren</button>
+        <button class="btn primary" id="btnSaveComment">SAVE</button>
+        <button class="btn" id="btnCancelComment">CANCEL</button>
       </div>
     </div>
   </div>
 
-  <!-- Opmerkingen overzicht -->
+  <!-- Notes overview -->
   <div class="overlay hidden" id="listOverlay">
     <div class="sheet">
-      <h3 style="margin-top:0">Opmerkingen <span class="sub" id="listCount"></span></h3>
+      <h3>Notes <span class="sub" id="listCount"></span></h3>
       <div id="commentList"></div>
-      <button id="btnCloseList" style="margin-top:10px">Sluiten</button>
+      <button class="btn" id="btnCloseList" style="margin-top:10px">CLOSE</button>
     </div>
   </div>
 
@@ -119,8 +212,7 @@
 const $ = (id) => document.getElementById(id);
 
 /* ============================================================
-   CONFIG — vul hier later je eigen waarden in (tussen de quotes)
-   Laat leeg ("") om het invoerveld in de app te laten bepalen.
+   CONFIG
    ============================================================ */
 const CONFIG = {
   tenant:           "Mono Lisa",
@@ -130,16 +222,10 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-/* Toon tenantnaam (of standaardtekst) zodra de pagina laadt */
-(function () {
-  const t = CONFIG.tenant && !CONFIG.tenant.startsWith("HIER-JOUW-") ? CONFIG.tenant : "";
-  if (t) $("tenantName").textContent = t;
-})();
-
 const state = {
   apiKey: "", clientId: "",
   privRoot: null, pubRoot: null,
-  folders: [], folderIdx: -1,        // elke map: {id, name, origin: "priv"|"pub"}
+  folders: [], folderIdx: -1,        // each folder: {id, name, origin: "priv"|"pub"}
   files: [], fileIdx: -1,
   comments: [], commentsFileId: null,
   token: null,
@@ -147,7 +233,7 @@ const state = {
 const audio = new Audio();
 audio.preload = "auto";
 
-/* ---------- Setup / opslag ---------- */
+/* ---------- Setup / storage ---------- */
 for (const [k, id, cfg] of [
   ["mlFolder","folderUrl","folderUrl"],
   ["mlPubFolder","publicFolderUrl","publicFolderUrl"],
@@ -157,19 +243,21 @@ for (const [k, id, cfg] of [
   const cfgVal = CONFIG[cfg] && !CONFIG[cfg].startsWith("HIER-JOUW-") ? CONFIG[cfg] : "";
   const v = localStorage.getItem(k) || cfgVal; if (v) $(id).value = v;
 }
-$("btnStart").addEventListener("click", start);
+$("btnStart").addEventListener("click", () => { saveSetup(); begin(); });
 $("btnRandom").addEventListener("click", async () => {
-  if (!state.folders.length) return start();
+  if (!state.folders.length) return begin();
   const idx = Math.floor(Math.random() * state.folders.length);
   await loadFolder(idx, Math.floor(Math.random() * 1000));
 });
 $("btnLogin").addEventListener("click", async () => {
   try {
     state.token = await getToken();
+    saveToken(state.token);
+    await loadFolderList();
+    await loadFolder(state.folderIdx >= 0 ? state.folderIdx : 0);
+    updateBalloon();
     $("btnLogin").classList.add("hidden");
-    await loadFolderList(); // privé-mappen erbij
-    await loadFolder(0);
-  } catch (e) { msg("Inloggen mislukt: " + e.message, false); }
+  } catch (e) { msg("Sign-in failed: " + e.message, false); }
 });
 
 function saveSetup() {
@@ -183,6 +271,31 @@ function msg(text, ok) {
   m.textContent = text; m.className = "msg " + (ok ? "ok" : "err");
 }
 
+/* ---------- Title cleaning ---------- */
+function cleanTitle(name) {
+  let t = name.replace(/\.[^.]+$/, "");                     // drop extension
+  t = t.replace(/^(kopie van|copy of)\s*/i, "");            // drop copy prefix
+  t = t.split("+")[0];                                     // hide suffix starting with '+'
+  t = t.trim().replace(/[\s_-]+$/, "");                     // trailing junk
+  t = t.replace(/[-_]+/g, " ");                             // dashes/underscores as spaces
+  t = t.replace(/\s+/g, " ").trim();
+  if (t) t = t[0].toUpperCase() + t.slice(1);               // first letter uppercase
+  return t || name.replace(/\.[^.]+$/, "");
+}
+function fmtTime(s) {
+  s = Math.max(0, Math.floor(s));
+  const m = Math.floor(s / 60);
+  return (m >= 60 ? Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0") : m) + ":" + String(s % 60).padStart(2, "0");
+}
+function trackLen(file) {
+  const d = localStorage.getItem("mlDur_" + file.id);
+  return d ? fmtTime(parseInt(d, 10)) : "–:––";
+}
+function rememberLen(file) {
+  if (isFinite(audio.duration) && audio.duration > 0)
+    localStorage.setItem("mlDur_" + file.id, String(Math.round(audio.duration)));
+}
+
 /* ---------- Drive helpers ---------- */
 function parseFolderId(s) {
   s = (s || "").trim();
@@ -194,14 +307,18 @@ async function driveGet(path, origin) {
   const headers = {};
   let url = "https://www.googleapis.com/drive/v3/" + path;
   if (origin === "priv") {
-    if (!state.token) throw new Error("Niet ingelogd");
+    if (!state.token) throw new Error("Not signed in");
     headers["Authorization"] = "Bearer " + state.token;
   } else {
-    if (!state.apiKey) throw new Error("Geen API-key ingesteld");
+    if (!state.apiKey) throw new Error("No API key configured");
     url += (path.includes("?") ? "&" : "?") + "key=" + state.apiKey;
   }
   const r = await fetch(url, { headers });
-  if (!r.ok) throw new Error("Drive fout " + r.status + ": " + (await r.text()).slice(0, 200));
+  if (r.status === 401 && state.token) {
+    clearToken();
+    throw new Error("Session expired — please sign in again.");
+  }
+  if (!r.ok) throw new Error("Drive error " + r.status + ": " + (await r.text()).slice(0, 200));
   return r.json();
 }
 async function listChildren(folderId, q, origin, orderBy) {
@@ -212,49 +329,46 @@ async function listChildren(folderId, q, origin, orderBy) {
   return res.files || [];
 }
 
-/* ---------- Start ---------- */
-async function start() {
-  saveSetup();
+/* ---------- Startup / tape loading ---------- */
+function readConfigInputs() {
   state.apiKey = $("apiKey").value.trim();
   state.clientId = $("clientId").value.trim();
   state.privRoot = parseFolderId($("folderUrl").value);
   state.pubRoot = parseFolderId($("publicFolderUrl").value);
-  if (!state.privRoot && !state.pubRoot) return msg("Vul minstens één map-URL in.", false);
-  if (state.pubRoot && !state.apiKey) return msg("Voor de publieke map is een API-key nodig.", false);
-  if (state.privRoot && !state.clientId) return msg("Voor de privé-map is een OAuth Client-ID nodig (inloggen).", false);
-
+}
+function updateBalloon() {
+  $("btnComment").classList.toggle("hidden", !state.token);
+}
+async function begin() {
+  readConfigInputs();
+  if (!state.privRoot && !state.pubRoot) { msg("Enter at least one folder URL.", false); $("setup").classList.remove("hidden"); $("setupDetails").open = true; return; }
+  if (state.pubRoot && !state.apiKey) { msg("The public folder needs an API key.", false); $("setup").classList.remove("hidden"); $("setupDetails").open = true; return; }
+  if (state.privRoot && !state.token && !state.clientId) { msg("The private folder needs a Client ID.", false); $("setup").classList.remove("hidden"); $("setupDetails").open = true; return; }
+  $("loginOverlay").classList.add("hidden");
   try {
-    // Probeeren al ingelogd? Token in sessie checken is niet nodig; we vragen alleen bij klikken op Inloggen.
     await loadFolderList();
-    if (!state.folders.length) {
-      if (state.privRoot && !state.token) {
-        msg("De privé-map verschijnt na het inloggen.", true);
-        $("setupDetails").open = false;
-        $("playerCard").classList.remove("hidden");
-        $("btnLogin").classList.remove("hidden");
-        return;
-      }
-      throw new Error("Geen speelbare mappen gevonden.");
-    }
-    msg("Geladen: " + state.folders.length + " map(pen).", true);
-    $("setupDetails").open = false;
-    $("playerCard").classList.remove("hidden");
-    if (state.privRoot && !state.token) $("btnLogin").classList.remove("hidden");
+    if (!state.folders.length) throw new Error("No playable folders found (is the folder shared / does it contain audio?).");
     await loadFolder(0);
   } catch (e) { msg(e.message, false); }
+  updateBalloon();
+  $("btnLogin").classList.toggle("hidden", !!(state.token || !state.privRoot));
 }
-
+function autoStart() {
+  readConfigInputs();
+  const tok = getSavedToken();
+  if (tok) { state.token = tok; begin(); return; }
+  if (state.privRoot && state.clientId) { $("loginOverlay").classList.remove("hidden"); return; }
+  begin();
+}
 async function loadFolderList() {
   const all = [];
-  // Publieke mappen (geen login)
   if (state.pubRoot) {
     let pubs = await listChildren(state.pubRoot,
       "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
       "pub", "modifiedTime desc");
-    if (!pubs.length) pubs = [{ id: state.pubRoot, name: "MixesPub", modifiedTime: new Date().toISOString() }];
+    if (!pubs.length) pubs = [{ id: state.pubRoot, name: "Public", modifiedTime: new Date().toISOString() }];
     pubs.forEach((f) => all.push({ ...f, origin: "pub" }));
   }
-  // Privé-mappen (alleen met token)
   if (state.privRoot && state.token) {
     let privs = await listChildren(state.privRoot,
       "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
@@ -262,16 +376,13 @@ async function loadFolderList() {
     if (!privs.length) privs = [{ id: state.privRoot, name: "Mixes", modifiedTime: new Date().toISOString() }];
     privs.forEach((f) => all.push({ ...f, origin: "priv" }));
   }
-  state.folders = all; // nieuwste eerst (API sorteert al per bron)
+  state.folders = all;
 }
-
-/* ---------- Speellijst (map) laden ---------- */
 async function loadFolder(idx, startAt) {
   if (!state.folders.length) return;
   state.folderIdx = ((idx % state.folders.length) + state.folders.length) % state.folders.length;
   const folder = state.folders[state.folderIdx];
-  $("listName").innerHTML = folder.name +
-    (folder.origin === "priv" ? " <span class='tag priv'>🔒</span>" : " <span class='tag'>🌐</span>");
+  $("listName").textContent = cleanTitle(folder.name) + (folder.origin === "priv" ? " 🔒" : " 🌐");
   state.files = (await listChildren(folder.id,
     "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
     folder.origin))
@@ -280,39 +391,43 @@ async function loadFolder(idx, startAt) {
   await loadComments(folder);
   if (state.files.length) await playTrack(startAt != null && startAt < state.files.length ? startAt : 0);
 }
-
 function renderTrackList() {
   const el = $("trackList"); el.innerHTML = "";
   state.files.forEach((f, i) => {
     const d = document.createElement("div");
     d.className = "track" + (i === state.fileIdx ? " active" : "");
-    d.innerHTML = "<span>" + f.name.replace(/\.[^.]+$/, "") + "</span>";
+    const span = document.createElement("span");
+    span.textContent = cleanTitle(f.name);
+    const len = document.createElement("span");
+    len.className = "len"; len.textContent = trackLen(f);
+    d.appendChild(span); d.appendChild(len);
     d.onclick = () => playTrack(i);
     el.appendChild(d);
   });
 }
 
-/* ---------- Audio (download als blob zodat OAuth-headers meekunnen) ---------- */
+/* ---------- Audio ---------- */
 async function playTrack(i) {
   const f = state.files[i]; if (!f) return;
   const folder = state.folders[state.folderIdx];
   state.fileIdx = i; renderTrackList();
-  $("trackName").textContent = f.name.replace(/\.[^.]+$/, "");
+  $("trackName").textContent = cleanTitle(f.name);
+  $("trackDur").textContent = trackLen(f);
   try {
     const url = await fetchAudioUrl(f.id, folder.origin);
     audio.src = url;
     await audio.play();
-    $("btnPlayPause").textContent = "⏸";
+    setPlaying(true);
   } catch (e) {
-    $("btnPlayPause").textContent = "▶";
-    msg("Kan nummer niet laden (" + (e.message || e) + ").", false);
+    setPlaying(false);
+    msg("Cannot load track (" + (e.message || e) + ").", false);
   }
 }
 async function fetchAudioUrl(fileId, origin) {
   const headers = {};
   let url = "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media";
   if (origin === "priv") {
-    if (!state.token) throw new Error("niet ingelogd");
+    if (!state.token) throw new Error("not signed in");
     headers["Authorization"] = "Bearer " + state.token;
   } else {
     url += "&key=" + state.apiKey;
@@ -320,31 +435,77 @@ async function fetchAudioUrl(fileId, origin) {
   const r = await fetch(url, { headers });
   if (!r.ok) throw new Error("HTTP " + r.status);
   const blob = await r.blob();
-  if (blob.size < 1024) throw new Error("bestand te klein / geen toegang");
+  if (blob.size < 1024) throw new Error("file too small / no access");
   return URL.createObjectURL(blob);
+}
+function setPlaying(p) {
+  $("ppGlyph").textContent = p ? "⏸" : "▶";
+  $("ppTxt").textContent = p ? "PAUSE" : "PLAY";
+  document.querySelectorAll(".reel").forEach((r) => r.classList.toggle("spin", p));
 }
 audio.addEventListener("ended", () => {
   if (state.fileIdx < state.files.length - 1) playTrack(state.fileIdx + 1);
   else if (state.folderIdx < state.folders.length - 1) loadFolder(state.folderIdx + 1);
 });
+audio.addEventListener("loadedmetadata", () => {
+  if (isFinite(audio.duration)) {
+    $("trackDur").textContent = fmtTime(audio.duration);
+    rememberLen(state.files[state.fileIdx]);
+    renderTrackList();
+  }
+});
 audio.addEventListener("timeupdate", () => {
-  const fmt = (s) => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
-  $("trackPos").textContent = fmt(audio.currentTime) + " / " + (isFinite(audio.duration) ? fmt(audio.duration) : "–:––");
+  $("trackPos").textContent = fmtTime(audio.currentTime);
   if (isFinite(audio.duration)) $("seek").value = (audio.currentTime / audio.duration) * 100;
 });
 $("seek").addEventListener("input", (e) => {
   if (isFinite(audio.duration)) audio.currentTime = (e.target.value / 100) * audio.duration;
 });
 $("btnPlayPause").addEventListener("click", () => {
-  if (audio.paused) { audio.play(); $("btnPlayPause").textContent = "⏸"; }
-  else { audio.pause(); $("btnPlayPause").textContent = "▶"; }
+  if (!audio.src) return;
+  if (audio.paused) { audio.play(); setPlaying(true); }
+  else { audio.pause(); setPlaying(false); }
 });
 $("btnBack10").addEventListener("click", () => audio.currentTime = Math.max(0, audio.currentTime - 10));
 $("btnFwd10").addEventListener("click", () => audio.currentTime = Math.min(audio.duration || 1e9, audio.currentTime + 10));
 $("btnPrevList").addEventListener("click", () => loadFolder(state.folderIdx - 1));
 $("btnNextList").addEventListener("click", () => loadFolder(state.folderIdx + 1));
 
-/* ---------- Opmerkingen ---------- */
+/* ---------- VU meter ---------- */
+let vuCtx = null, vuRaf = null;
+function startVU() {
+  if (vuRaf) return;
+  try {
+    if (!vuCtx) vuCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (vuCtx.state === "suspended") vuCtx.resume();
+    const src = vuCtx.createMediaElementSource(audio);
+    const analyser = vuCtx.createAnalyser();
+    analyser.fftSize = 256;
+    src.connect(analyser); analyser.connect(vuCtx.destination);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    const barsL = $("vuL").children, barsR = $("vuR").children;
+    const draw = () => {
+      analyser.getByteFrequencyData(data);
+      // gemiddelde van lage band (links-gevoelig) en hoge band (rechts-gevoelig)
+      const avg = (from, to) => {
+        let s = 0; for (let i = from; i < to; i++) s += data[i];
+        return s / (to - from) / 255;
+      };
+      const lvlL = Math.min(1, avg(0, 60) * 1.4);
+      const lvlR = Math.min(1, avg(60, 128) * 1.4);
+      const paint = (bars, lvl) => {
+        const n = bars.length, lit = Math.round(lvl * n);
+        for (let i = 0; i < n; i++) bars[i].classList.toggle("on", i < lit && !audio.paused);
+      };
+      paint(barsL, lvlL); paint(barsR, lvlR);
+      vuRaf = requestAnimationFrame(draw);
+    };
+    vuRaf = requestAnimationFrame(draw);
+  } catch (e) { /* VU meter optional */ }
+}
+audio.addEventListener("play", startVU);
+
+/* ---------- Notes ---------- */
 const MD_NAME = "opmerkingen.md";
 async function loadComments(folder) {
   state.comments = []; state.commentsFileId = null;
@@ -355,7 +516,7 @@ async function loadComments(folder) {
       const txt = await fetchFileText(files[0].id, folder.origin);
       state.comments = parseComments(txt);
     }
-  } catch (e) { /* nog geen opmerkingenbestand */ }
+  } catch (e) { /* no notes file yet */ }
   const local = localStorage.getItem("mlComments_" + folder.id);
   if (local && !state.commentsFileId) state.comments = parseComments(local);
   renderComments(null);
@@ -375,7 +536,6 @@ function parseComments(md) {
   }
   return out.sort((a, b) => a.sec - b.sec);
 }
-function fmtTime(s) { return Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0"); }
 function commentsAsMd() {
   return state.comments.map((c) => "- [" + fmtTime(c.sec) + "] " + c.text).join("\n") + "\n";
 }
@@ -390,10 +550,8 @@ function renderComments(currentSec) {
     d.innerHTML = "<span class='ts'>[" + fmtTime(c.sec) + "]</span>" + c.text.replace(/[<>&]/g, (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[ch]));
     wrap.appendChild(d);
   });
-  if (!state.comments.length) wrap.innerHTML = "<div class='sub'>Nog geen opmerkingen in deze map.</div>";
+  if (!state.comments.length) wrap.innerHTML = "<div class='sub'>No notes in this tape yet.</div>";
 }
-
-/* Tekstballon: tik = invoeren, vasthouden = overzicht */
 let holdTimer = null, held = false;
 const balloon = $("btnComment");
 balloon.addEventListener("pointerdown", () => {
@@ -402,10 +560,9 @@ balloon.addEventListener("pointerdown", () => {
 });
 ["pointerup", "pointerleave"].forEach((ev) => balloon.addEventListener(ev, () => clearTimeout(holdTimer)));
 balloon.addEventListener("click", () => { if (!held) openCommentInput(); });
-
 function openCommentInput() {
   if (!audio.src) return;
-  $("inputAt").textContent = "op " + fmtTime(audio.currentTime) + " in " + $("trackName").textContent;
+  $("inputAt").textContent = "at " + fmtTime(audio.currentTime) + " in " + $("trackName").textContent;
   $("commentText").value = "";
   $("inputOverlay").classList.remove("hidden");
   setTimeout(() => $("commentText").focus(), 50);
@@ -417,10 +574,8 @@ function openCommentList() {
 $("btnCancelComment").addEventListener("click", () => $("inputOverlay").classList.add("hidden"));
 $("btnCloseList").addEventListener("click", () => $("listOverlay").classList.add("hidden"));
 [$("inputOverlay"), $("listOverlay")].forEach((ov) => ov.addEventListener("click", (e) => { if (e.target === ov) ov.classList.add("hidden"); }));
-
 $("btnSaveComment").addEventListener("click", saveComment);
 $("commentText").addEventListener("keydown", (e) => { if (e.key === "Enter") saveComment(); });
-
 async function saveComment() {
   const text = $("commentText").value.trim();
   if (!text) return $("inputOverlay").classList.add("hidden");
@@ -430,7 +585,7 @@ async function saveComment() {
   $("inputOverlay").classList.add("hidden");
   renderComments(audio.currentTime);
   if (!state.token) {
-    alert("Voor het opslaan van opmerkingen in Drive moet je eerst inloggen (knop onderaan).\nDe opmerking blijft nu alleen op dit apparaat bewaard.");
+    alert("To save notes to Drive you need to sign in first (LOG IN button).\nThe note is kept on this device only for now.");
   }
   await persistComments(folder);
 }
@@ -444,7 +599,7 @@ async function persistComments(folder) {
         headers: { Authorization: "Bearer " + state.token },
         body: makeMultipart(md, folder.id),
       })).json();
-      if (!meta.id) throw new Error("aanmaken mislukt");
+      if (!meta.id) throw new Error("create failed");
       state.commentsFileId = meta.id;
     } else {
       await fetch("https://www.googleapis.com/upload/drive/v3/files/" + state.commentsFileId + "?uploadType=media", {
@@ -455,7 +610,7 @@ async function persistComments(folder) {
     }
     localStorage.removeItem("mlComments_" + folder.id);
   } catch (e) {
-    alert("Opslaan in Drive mislukt (" + (e.message || e) + "). De opmerking blijft alleen lokaal bewaard.");
+    alert("Saving to Drive failed (" + (e.message || e) + "). The note is kept locally.");
     localStorage.setItem("mlComments_" + folder.id, md);
   }
 }
@@ -467,7 +622,7 @@ function makeMultipart(md, folderId) {
   return new Blob([head + md + "\r\n--" + boundary + "--"]);
 }
 
-/* Google Identity Services OAuth */
+/* ---------- Google Identity Services OAuth ---------- */
 let gisPromise = null;
 function getToken() {
   return new Promise((resolve, reject) => {
@@ -475,22 +630,65 @@ function getToken() {
       const client = window.google.accounts.oauth2.initTokenClient({
         client_id: state.clientId,
         scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file",
-        callback: (r) => r.access_token ? resolve(r.access_token) : reject(new Error("geen token ontvangen")),
+        callback: (r) => r.access_token ? resolve(r.access_token) : reject(new Error("no token received")),
       });
-      client.requestAccessToken();
+      client.requestAccessToken({ prompt: "" }); // silent reuse of earlier consent when possible
     };
     if (window.google && window.google.accounts && window.google.accounts.oauth2) return use();
     if (!gisPromise) {
       gisPromise = new Promise((res, rej) => {
         const s = document.createElement("script");
         s.src = "https://accounts.google.com/gsi/client";
-        s.onload = res; s.onerror = () => rej(new Error("Google-login kon niet laden"));
+        s.onload = res; s.onerror = () => rej(new Error("Google sign-in script failed to load"));
         document.head.appendChild(s);
       });
     }
     gisPromise.then(use).catch(reject);
   });
 }
+
+/* ---------- Token session cache ---------- */
+function saveToken(t) {
+  try { sessionStorage.setItem("mlToken", t); sessionStorage.setItem("mlTokenTs", String(Date.now())); } catch (e) {}
+}
+function getSavedToken() {
+  try {
+    const t = sessionStorage.getItem("mlToken");
+    const ts = parseInt(sessionStorage.getItem("mlTokenTs") || "0", 10);
+    if (t && Date.now() - ts < 50 * 60 * 1000) return t;
+    sessionStorage.removeItem("mlToken"); sessionStorage.removeItem("mlTokenTs");
+  } catch (e) {}
+  return null;
+}
+function clearToken() {
+  state.token = null;
+  try { sessionStorage.removeItem("mlToken"); sessionStorage.removeItem("mlTokenTs"); } catch (e) {}
+}
+
+/* ---------- Buttons & init ---------- */
+$("btnSettings").addEventListener("click", () => {
+  const s = $("setup");
+  const hidden = s.classList.toggle("hidden");
+  if (!hidden) $("setupDetails").open = true;
+});
+$("btnDoLogin").addEventListener("click", async () => {
+  try {
+    saveSetup();
+    state.token = await getToken();
+    saveToken(state.token);
+    begin();
+  } catch (e) { msg("Sign-in failed: " + e.message, false); }
+});
+$("btnPubOnly").addEventListener("click", () => { saveSetup(); begin(); });
+
+(function init() {
+  const t = CONFIG.tenant && !CONFIG.tenant.startsWith("HIER-JOUW-") ? CONFIG.tenant : "";
+  if (t) { $("tenantName").textContent = t; $("loginTenant").textContent = t; }
+  const filled = ($("folderUrl").value.trim() && !$("folderUrl").value.includes("HIER-JOUW-")) ||
+                ($("publicFolderUrl").value.trim() && !$("publicFolderUrl").value.includes("HIER-JOUW-"));
+  if (filled) autoStart();
+  else { $("setup").classList.remove("hidden"); $("setupDetails").open = true; }
+})();
 </script>
 </body>
 </html>
