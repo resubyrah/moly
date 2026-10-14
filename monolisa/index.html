@@ -85,7 +85,7 @@
   .track:hover { background:#241f15; }
   .track.active { background:#33280f; color:#e8c46a; }
   .track .len { color:#776b52; font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .hidden { display:none; }
+  .hidden { display:none !important; }
 
   /* ---------- Sheets / overlays ---------- */
   .overlay { position:fixed; inset:0; background:rgba(10,8,5,.7); display:flex;
@@ -118,7 +118,10 @@
   <div class="deck" id="deck">
     <div class="brandbar">
       <div class="brand">MOLY<small id="tenantName">compact music system</small></div>
-      <button class="settingsbtn" id="btnSettings" title="Settings">⚙ SETUP</button>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px">
+        <button class="settingsbtn" id="btnSettings" title="Settings">⚙ SETUP</button>
+        <span id="versionTag" style="font-size:.6rem; color:#7a6c4d; letter-spacing:.05em"></span>
+      </div>
     </div>
 
     <div class="cassette">
@@ -221,6 +224,8 @@ const CONFIG = {
   apiKey:           "AIzaSyCtyBR39w4_5-gVkl7ytSyZ2Hf1fHEOYb0",
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
+
+const APP_VERSION = "v2026-10-14.3";
 
 const state = {
   apiKey: "", clientId: "",
@@ -686,6 +691,7 @@ $("btnDoLogin").addEventListener("click", async () => {
 $("btnPubOnly").addEventListener("click", () => { saveSetup(); begin(); });
 
 (function init() {
+  $("versionTag").textContent = APP_VERSION;
   const t = CONFIG.tenant && !CONFIG.tenant.startsWith("HIER-JOUW-") ? CONFIG.tenant : "";
   if (t) { $("tenantName").textContent = t; $("loginTenant").textContent = t; }
   const filled = ($("folderUrl").value.trim() && !$("folderUrl").value.includes("HIER-JOUW-")) ||
