@@ -30,6 +30,7 @@
   .iconbtn { background:none; border:1px solid #6a5c44; border-radius:6px; padding:3px 7px;
              cursor:pointer; font:inherit; font-size:.95rem; color:#8a7c60; line-height:1.2; }
   .iconbtn.active { color:#5aa5e0; border-color:#3a5a75; box-shadow:0 0 6px rgba(90,165,224,.35); }
+  .iconbtn:disabled { opacity:.3; cursor:default; }
   .iconbtn:active { transform:translateY(1px); }
 
   /* ---------- Cassette window ---------- */
@@ -42,16 +43,15 @@
   .counter { position:relative; text-align:center; color:#c46a2b; font-size:1rem; letter-spacing:.2em;
              text-shadow:0 0 6px rgba(255,120,30,.55); margin-bottom:2px; }
   .counter .dur { color:#8a7c60; letter-spacing:.05em; text-shadow:none; }
-  .counter .iconbtn { position:absolute; right:0; top:50%; transform:translateY(-50%); letter-spacing:0; }
+  .counter .iconbtn { position:absolute; right:0; top:50%; transform:translateY(-50%); letter-spacing:0;
+                      border:none; background:none; padding:2px; }
   .reelbay { position:relative; height:132px; margin:16px 0 8px; }
   .reel { position:absolute; top:50%; transform:translateY(-50%); width:104px; height:104px; border-radius:50%;
           background:radial-gradient(circle,#e5d9b8 0%,#c9b98a 40%,#8f7d52 100%);
           border:6px solid #2a2318; box-shadow:0 2px 8px #000, inset 0 0 0 1px rgba(255,240,200,.25); }
   .reel.left { left:calc(25% - 52px); }
   .reel.right { left:calc(75% - 52px); }
-  .reel::before, .reel::after { content:""; position:absolute; background:#241f15; border-radius:40%; z-index:3; }
-  .reel::before { width:44px; height:5px; left:7px; top:26px; box-shadow:0 12px 0 #241f15, 0 -12px 0 #241f15; }
-  .reel::after { width:5px; height:44px; top:7px; left:26px; box-shadow:12px 0 0 #241f15, -12px 0 0 #241f15; }
+  .reel::before, .reel::after { display:none; }
   .reel .pile { position:absolute; inset:0; margin:auto; width:var(--d,50px); height:var(--d,50px);
                 border-radius:50%; background:radial-gradient(circle at 35% 30%,#4a2f1c,#2a1a10 70%);
                 box-shadow:inset 0 0 4px rgba(0,0,0,.6); transition:width .4s, height .4s; }
@@ -63,8 +63,11 @@
                display:flex; align-items:center; justify-content:center; gap:6px; }
   .strip { height:12px; flex:1; border-radius:2px;
            background:linear-gradient(180deg,#4a2f1c,#2a1a10); box-shadow:0 1px 2px #000; }
-  .spin { animation:spin 3.2s linear infinite; transform-origin:50% 50%; }
-  @keyframes spin { to { transform:rotate(360deg); } }
+  .spin { animation:spin 3.2s linear infinite; }
+  @keyframes spin {
+    from { transform:translateY(-50%) rotate(0deg); }
+    to   { transform:translateY(-50%) rotate(360deg); }
+  }
   .cassette .pile { z-index:1; }
   input[type=range] { width:100%; accent-color:#e8c46a; margin-top:8px; }
 
@@ -146,7 +149,7 @@
           <button class="iconbtn" id="btnLogin" title="Sign in for private tapes">🔑</button>
           <button class="iconbtn" id="btnMode" title="Access mode">🌐</button>
           <button class="iconbtn" id="btnRandom" title="Shuffle tape &amp; track">🎲</button>
-          <button class="settingsbtn" id="btnSettings" title="Settings">⚙</button>
+          <button class="iconbtn" id="btnSettings" title="Settings" style="font-size:1.05rem">⚙</button>
         </div>
         <span id="versionTag" style="font-size:.6rem; color:#7a6c4d; letter-spacing:.05em"></span>
       </div>
@@ -175,9 +178,6 @@
     </div>
 
     <div class="tapebox">
-      <div class="tapenav" style="justify-content:center">
-        <div class="name" id="listName">—</div>
-      </div>
       <div class="list" id="trackList"></div>
     </div>
   </div>
@@ -248,7 +248,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "v2026-10-14.13";
+const APP_VERSION = "1.1";
 
 const state = {
   apiKey: "", clientId: "",
@@ -381,13 +381,15 @@ function readConfigInputs() {
 }
 function updateBalloon() {
   $("btnComment").classList.toggle("hidden", !state.token);
-  const pub = state.mode === "public" || !state.token;
   const m = $("btnMode");
-  m.classList.toggle("active", pub);
-  m.textContent = "🌐";
-  m.title = pub ? "Public mode — showing public tapes only" : "Showing all tapes (private & public)";
+  m.classList.toggle("active", state.mode === "public" || !state.token);
+  m.disabled = !!state.token;                     // signed in → private mode is on, globe disabled
+  m.title = state.token ? "Signed in — showing your private tapes" :
+            (state.mode === "public" ? "Public mode — public tapes only" : "Public tapes");
   const k = $("btnLogin");
+  k.disabled = !!(state.token && state.mode !== "public");   // already where the key leads
   k.title = state.token ? "Back to private mode (all tapes)" : "Sign in with Google for private tapes";
+  $("btnRandom").disabled = state.folders.length < 2;       // shuffle needs more than one tape
 }
 async function begin() {
   readConfigInputs();
@@ -398,7 +400,13 @@ async function begin() {
   try {
     await loadFolderList();
     if (!state.folders.length) throw new Error("No playable folders found (is the folder shared / does it contain audio?).");
-    await loadFolder(0);
+    // Signed in → start with the newest private tape ('Mixes YYMMDD'); otherwise the first public one
+    let startIdx = 0;
+    if (state.token) {
+      const i = state.folders.findIndex((f) => f.origin === "priv");
+      if (i >= 0) startIdx = i;
+    }
+    await loadFolder(startIdx);
   } catch (e) { msg(e.message, false); }
   updateBalloon();
 }
@@ -423,17 +431,19 @@ async function loadFolderList() {
       "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
       "priv", "modifiedTime desc");
     if (!privs.length) privs = [{ id: state.privRoot, name: "Mixes", modifiedTime: new Date().toISOString() }];
+    // Sort by date in the name ('Mixes YYMMDD', suffixes ignored) — newest first
+    const dateKey = (n) => { const m = (n || "").match(/(\d{6})/); return m ? m[1] : ""; };
+    privs.sort((a, b) => dateKey(b.name).localeCompare(dateKey(a.name)) || (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));
     privs.forEach((f) => all.push({ ...f, origin: "priv" }));
   }
   state.folders = all;
+  $("btnRandom").disabled = all.length < 2;
 }
 async function loadFolder(idx, startAt) {
   if (!state.folders.length) return;
   state.folderIdx = ((idx % state.folders.length) + state.folders.length) % state.folders.length;
   const folder = state.folders[state.folderIdx];
-  const mixed = state.folders.some((f) => f.origin === "priv") && state.folders.some((f) => f.origin === "pub");
-  $("listName").textContent = cleanTitle(folder.name) + (mixed ? (folder.origin === "priv" ? "  🔒" : "  🌐") : "");
-  $("brandDate").textContent = cleanTitle(folder.name);   // tape/folder date next to the cassette icon
+  $("brandDate").textContent = cleanTitle(folder.name);   // tape/folder next to the cassette icon
   $("brandDate").title = folder.name;
   state.files = (await listChildren(folder.id,
     "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
@@ -538,8 +548,9 @@ function tapeProgress() {
 }
 function updateTapePiles() {
   const p = tapeProgress();
-  $("pileL").style.setProperty("--d", (36 + (1 - p) * 54) + "px");  // supply reel empties
-  $("pileR").style.setProperty("--d", (36 + p * 54) + "px");        // take-up reel fills
+  // Left reel starts full and empties; right reel fills. Strong contrast so the move is clearly visible.
+  $("pileL").style.setProperty("--d", (32 + (1 - p) * 52) + "px");  // supply reel empties
+  $("pileR").style.setProperty("--d", (32 + p * 52) + "px");        // take-up reel fills
 }
 audio.addEventListener("timeupdate", () => {
   $("trackPos").textContent = fmtTime(audio.currentTime);
@@ -547,7 +558,7 @@ audio.addEventListener("timeupdate", () => {
   if (ms && isFinite(audio.duration)) ms.value = (audio.currentTime / audio.duration) * 100;
   const mp = $("miniPos");
   if (mp) mp.textContent = fmtTime(audio.currentTime);
-  if (isFinite(audio.duration)) $("seek").value = (audio.currentTime / audio.duration) * 100;
+  if (isFinite(audio.duration)) { const sk = $("seek"); if (sk) sk.value = (audio.currentTime / audio.duration) * 100; }
   updateTapePiles();
 });
 $("seek") && $("seek").addEventListener("input", (e) => {
