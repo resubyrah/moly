@@ -182,24 +182,30 @@
     </div>
   </div>
 
-  <!-- Settings (hidden by default) -->
-  <div class="sheet hidden" id="setup" style="margin-top:14px">
-    <details id="setupDetails">
-      <summary>Setup</summary>
-      <label>Private folder (sign-in required; share with specific people)</label>
-      <input id="folderUrl" placeholder="https://drive.google.com/drive/folders/... (Mixes)" />
-      <label>Public folder (anyone with the link — Reader, no sign-in)</label>
-      <input id="publicFolderUrl" placeholder="https://drive.google.com/drive/folders/... (MixesPub) — may be empty" />
-      <label>Google API key (for the public folder)</label>
-      <input id="apiKey" placeholder="AIza..." />
-      <label>OAuth Client ID (for sign-in, private folder and notes)</label>
-      <input id="clientId" placeholder="xxxxx.apps.googleusercontent.com" />
-      <div class="row">
-        <button class="btn primary" id="btnStart">LOAD &amp; PLAY</button>
-      </div>
-      <div id="setupMsg" class="msg hidden"></div>
-    </details>
+  <!-- Settings modal -->
+  <div class="overlay hidden" id="setupOverlay">
+    <div class="sheet">
+      <h3>Setup</h3>
+      <details id="setupDetails" open>
+        <summary style="margin-bottom:6px">Folders &amp; keys</summary>
+        <label>Private folder (sign-in required; share with specific people)</label>
+        <input id="folderUrl" placeholder="https://drive.google.com/drive/folders/... (Mixes)" />
+        <label>Public folder (anyone with the link — Reader, no sign-in)</label>
+        <input id="publicFolderUrl" placeholder="https://drive.google.com/drive/folders/... (MixesPub) — may be empty" />
+        <label>Google API key (for the public folder)</label>
+        <input id="apiKey" placeholder="AIza..." />
+        <label>OAuth Client ID (for sign-in, private folder and notes)</label>
+        <input id="clientId" placeholder="xxxxx.apps.googleusercontent.com" />
+        <div class="row">
+          <button class="btn primary" id="btnStart">LOAD &amp; PLAY</button>
+          <button class="btn" id="btnCloseSetup">CLOSE</button>
+        </div>
+      </details>
+    </div>
   </div>
+
+  <!-- Error / status bar (independent of setup) -->
+  <div id="errorBar" class="msg err hidden" style="position:fixed; left:16px; right:16px; bottom:14px; z-index:20; max-width:488px; margin-inline:auto"></div>
 
   <!-- Sign-in -->
   <div class="overlay hidden" id="loginOverlay">
@@ -248,7 +254,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.1";
+const APP_VERSION = "1.2";
 
 const state = {
   apiKey: "", clientId: "",
@@ -306,10 +312,11 @@ function saveSetup() {
   localStorage.setItem("mlClient", $("clientId").value);
 }
 function msg(text, ok) {
-  const m = $("setupMsg");
-  m.textContent = text; m.className = "msg " + (ok ? "ok" : "err");
-  $("setup").classList.remove("hidden");   // always show errors, even if setup was hidden
-  $("setupDetails").open = true;
+  const m = $("errorBar");
+  m.textContent = text;
+  m.className = "msg " + (ok ? "ok" : "err");
+  clearTimeout(msg._t);
+  msg._t = setTimeout(() => m.classList.add("hidden"), ok ? 4000 : 12000);  // auto-hide
 }
 window.addEventListener("error", (e) => { try { msg("Error: " + e.message, false); } catch (_) {} });
 window.addEventListener("unhandledrejection", (e) => { try { msg("Error: " + (e.reason && e.reason.message || e.reason), false); } catch (_) {} });
@@ -393,9 +400,9 @@ function updateBalloon() {
 }
 async function begin() {
   readConfigInputs();
-  if (!state.privRoot && !state.pubRoot) { msg("Enter at least one folder URL.", false); $("setup").classList.remove("hidden"); $("setupDetails").open = true; return; }
-  if (state.pubRoot && !state.apiKey) { msg("The public folder needs an API key.", false); $("setup").classList.remove("hidden"); $("setupDetails").open = true; return; }
-  if (state.privRoot && !state.token && !state.clientId) { msg("The private folder needs a Client ID.", false); $("setup").classList.remove("hidden"); $("setupDetails").open = true; return; }
+  if (!state.privRoot && !state.pubRoot) { openSetup(); msg("Enter at least one folder URL.", false); return; }
+  if (state.pubRoot && !state.apiKey) { openSetup(); msg("The public folder needs an API key.", false); return; }
+  if (state.privRoot && !state.token && !state.clientId) { openSetup(); msg("The private folder needs a Client ID.", false); return; }
   $("loginOverlay").classList.add("hidden");
   try {
     await loadFolderList();
@@ -431,8 +438,8 @@ async function loadFolderList() {
       "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
       "priv", "modifiedTime desc");
     if (!privs.length) privs = [{ id: state.privRoot, name: "Mixes", modifiedTime: new Date().toISOString() }];
-    // Sort by date in the name ('Mixes YYMMDD', suffixes ignored) — newest first
-    const dateKey = (n) => { const m = (n || "").match(/(\d{6})/); return m ? m[1] : ""; };
+    // Sort by date in the name ('Mixes YYYYMMDD', suffixes ignored) — newest first
+    const dateKey = (n) => { const m = (n || "").match(/(\d{8})/); return m ? m[1] : ""; };
     privs.sort((a, b) => dateKey(b.name).localeCompare(dateKey(a.name)) || (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));
     privs.forEach((f) => all.push({ ...f, origin: "priv" }));
   }
@@ -445,6 +452,10 @@ async function loadFolder(idx, startAt) {
   const folder = state.folders[state.folderIdx];
   $("brandDate").textContent = cleanTitle(folder.name);   // tape/folder next to the cassette icon
   $("brandDate").title = folder.name;
+  $("btnPrevList").disabled = state.folderIdx <= 0 && state.folders.length <= 1;
+  $("btnNextList").disabled = state.folderIdx >= state.folders.length - 1 && state.folders.length > 1;
+  $("btnPrevList").classList.toggle("hidden", state.folders.length <= 1);
+  $("btnNextList").classList.toggle("hidden", state.folders.length <= 1);
   state.files = (await listChildren(folder.id,
     "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
     folder.origin))
@@ -807,10 +818,13 @@ function clearToken() {
 
 /* ---------- Buttons & init ---------- */
 $("btnSettings").addEventListener("click", () => {
-  const s = $("setup");
-  const hidden = s.classList.toggle("hidden");
-  if (!hidden) $("setupDetails").open = true;
+  const ov = $("setupOverlay");
+  if (ov.classList.contains("hidden")) openSetup();
+  else ov.classList.add("hidden");
 });
+function openSetup() { $("setupOverlay").classList.remove("hidden"); $("setupDetails").open = true; }
+$("btnCloseSetup").addEventListener("click", () => $("setupOverlay").classList.add("hidden"));
+$("setupOverlay").addEventListener("click", (e) => { if (e.target === $("setupOverlay")) $("setupOverlay").classList.add("hidden"); });
 $("btnDoLogin").addEventListener("click", async () => {
   try {
     saveSetup();
@@ -833,7 +847,7 @@ $("btnPubOnly").addEventListener("click", () => { saveSetup(); begin(); });
   const filled = ($("folderUrl").value.trim() && !$("folderUrl").value.includes("HIER-JOUW-")) ||
                 ($("publicFolderUrl").value.trim() && !$("publicFolderUrl").value.includes("HIER-JOUW-"));
   if (filled) autoStart();
-  else { $("setup").classList.remove("hidden"); $("setupDetails").open = true; }
+  else { openSetup(); }
 })();
 </script>
 </body>
