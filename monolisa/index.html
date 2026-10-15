@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#22201c" />
-<title>Moly</title>
+<title>Mono Lisa</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
 <link rel="manifest" href='data:application/manifest+json,{"name":"Moly","short_name":"Moly","display":"standalone","background_color":"%2322201c","theme_color":"%2322201c","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%2322201c%27/%3E%3Crect x=%276%27 y=%2714%27 width=%2752%27 height=%2736%27 rx=%275%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Crect x=%2714%27 y=%2748%27 width=%2736%27 height=%274%27 rx=%272%27 fill=%27%23241f15%27/%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}' />
@@ -27,25 +27,45 @@
   .settingsbtn { background:none; border:1px solid #6a5c44; color:#cdbf9c; border-radius:6px;
                  padding:4px 8px; cursor:pointer; font:inherit; font-size:.75rem; }
   .settingsbtn:active { transform:translateY(1px); }
+  .iconbtn { background:none; border:1px solid #6a5c44; border-radius:6px; padding:3px 7px;
+             cursor:pointer; font:inherit; font-size:.95rem; color:#8a7c60; line-height:1.2; }
+  .iconbtn.active { color:#5aa5e0; border-color:#3a5a75; box-shadow:0 0 6px rgba(90,165,224,.35); }
+  .iconbtn:active { transform:translateY(1px); }
 
   /* ---------- Cassette window ---------- */
-  .cassette { background:linear-gradient(180deg,#161310,#0d0b08); border:1px solid #000;
-              border-radius:12px; padding:14px 14px 12px; box-shadow:inset 0 2px 8px #000; }
-  .reels { display:flex; justify-content:center; gap:46px; margin-bottom:8px; }
-  .reel { width:64px; height:64px; border-radius:50%;
-          background:radial-gradient(circle,#c9b98a 0%,#8f7d52 55%,#5c4d31 100%);
-          border:3px solid #2a2318; position:relative; box-shadow:0 2px 6px #000; }
-  .reel::before, .reel::after { content:""; position:absolute; background:#241f15; border-radius:40%; }
-  .reel::before { width:44px; height:5px; left:8px; top:28px; box-shadow:0 12px 0 #241f15, 0 -12px 0 #241f15; }
-  .reel::after { width:5px; height:44px; top:8px; left:28px; box-shadow:12px 0 0 #241f15, -12px 0 0 #241f15; }
-  .spin { animation:spin 3.2s linear infinite; transform-origin:50% 50%; }
-  .paused .reel { animation-play-state:paused; }
-  @keyframes spin { to { transform:rotate(360deg); } }
+  .cassette { background:linear-gradient(180deg,#161310,#0d0b08);
+              border-radius:12px; padding:16px 16px 14px; box-shadow:inset 0 2px 8px #000;
+              border:3px solid #4d4433; outline:1px solid #000; }
   .tape-label { background:linear-gradient(180deg,#f4ecd7,#e2d6b8); color:#3a3020; border-radius:4px;
-                padding:6px 10px; text-align:center; font-size:.95rem; font-weight:700; letter-spacing:.04em;
+                padding:7px 12px; text-align:center; font-size:1.05rem; font-weight:700; letter-spacing:.04em;
                 overflow-wrap:anywhere; margin-bottom:6px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
-  .counter { text-align:center; color:#c46a2b; font-size:.95rem; letter-spacing:.2em; text-shadow:0 0 6px rgba(255,120,30,.55); }
+  .counter { position:relative; text-align:center; color:#c46a2b; font-size:1rem; letter-spacing:.2em;
+             text-shadow:0 0 6px rgba(255,120,30,.55); margin-bottom:2px; }
   .counter .dur { color:#8a7c60; letter-spacing:.05em; text-shadow:none; }
+  .counter .iconbtn { position:absolute; right:0; top:50%; transform:translateY(-50%); letter-spacing:0; }
+  .reelbay { position:relative; height:132px; margin:16px 0 8px; }
+  .reel { position:absolute; top:50%; transform:translateY(-50%); width:104px; height:104px; border-radius:50%;
+          background:radial-gradient(circle,#e5d9b8 0%,#c9b98a 40%,#8f7d52 100%);
+          border:6px solid #2a2318; box-shadow:0 2px 8px #000, inset 0 0 0 1px rgba(255,240,200,.25); }
+  .reel.left { left:calc(25% - 52px); }
+  .reel.right { left:calc(75% - 52px); }
+  .reel::before, .reel::after { content:""; position:absolute; background:#241f15; border-radius:40%; z-index:3; }
+  .reel::before { width:44px; height:5px; left:7px; top:26px; box-shadow:0 12px 0 #241f15, 0 -12px 0 #241f15; }
+  .reel::after { width:5px; height:44px; top:7px; left:26px; box-shadow:12px 0 0 #241f15, -12px 0 0 #241f15; }
+  .reel .pile { position:absolute; inset:0; margin:auto; width:var(--d,50px); height:var(--d,50px);
+                border-radius:50%; background:radial-gradient(circle at 35% 30%,#4a2f1c,#2a1a10 70%);
+                box-shadow:inset 0 0 4px rgba(0,0,0,.6); transition:width .4s, height .4s; }
+  .reel .hub { position:absolute; inset:0; margin:auto; width:28px; height:28px; border-radius:50%; z-index:4;
+               background:conic-gradient(#d8d8de,#9a9aa2,#e2e2e8,#8a8a92,#d8d8de);
+               border:2px solid #55555e; box-shadow:0 1px 3px #000; }
+  .taperoad { position:absolute; top:50%; transform:translateY(-50%);
+               left:calc(25% + 58px); right:calc(25% + 58px);
+               display:flex; align-items:center; justify-content:center; gap:6px; }
+  .strip { height:12px; flex:1; border-radius:2px;
+           background:linear-gradient(180deg,#4a2f1c,#2a1a10); box-shadow:0 1px 2px #000; }
+  .spin { animation:spin 3.2s linear infinite; transform-origin:50% 50%; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .cassette .pile { z-index:1; }
   input[type=range] { width:100%; accent-color:#e8c46a; margin-top:8px; }
 
   /* ---------- VU meter ---------- */
@@ -117,25 +137,29 @@
 <body>
   <div class="deck" id="deck">
     <div class="brandbar">
-      <div class="brand">MOLY<small id="tenantName">compact music system</small></div>
+      <div class="brand" style="align-items:center; display:flex; gap:8px">
+        <img alt="cassette" style="width:22px; height:22px; display:block" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
+        <span id="brandDate" style="letter-spacing:.02em; font-size:.9rem">Mono Lisa</span>
+      </div>
       <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px">
         <div style="display:flex; gap:6px; align-items:center">
-          <span id="accessIcons" title="Access mode" style="font-size:.85rem"></span>
-          <button class="settingsbtn hidden" id="btnLogin" title="Sign in for private tapes">🔐 LOG IN</button>
-          <button class="settingsbtn" id="btnSettings" title="Settings">⚙ SETUP</button>
+          <button class="iconbtn" id="btnLogin" title="Sign in for private tapes">🔑</button>
+          <button class="iconbtn" id="btnMode" title="Access mode">🌐</button>
+          <button class="iconbtn" id="btnRandom" title="Shuffle tape &amp; track">🎲</button>
+          <button class="settingsbtn" id="btnSettings" title="Settings">⚙</button>
         </div>
         <span id="versionTag" style="font-size:.6rem; color:#7a6c4d; letter-spacing:.05em"></span>
       </div>
     </div>
 
     <div class="cassette">
-      <div class="reels" id="reels">
-        <div class="reel"></div>
-        <div class="reel"></div>
-      </div>
       <div class="tape-label" id="trackName">—</div>
-      <div class="counter"><span id="trackPos">0:00</span> <span class="dur">/ <span id="trackDur">–:––</span></span></div>
-      <input type="range" id="seek" min="0" max="100" value="0" />
+      <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span> <button class="iconbtn" id="btnComment" style="font-size:.7rem; vertical-align:middle" title="Tap = add note at this moment · Hold = show notes">💬</button></div>
+      <div class="reelbay" id="reels">
+        <div class="reel left"><div class="pile" id="pileL"></div><div class="hub"></div></div>
+        <div class="taperoad"><div class="strip"></div></div>
+        <div class="reel right"><div class="pile" id="pileR"></div><div class="hub"></div></div>
+      </div>
       <div class="vu" id="vu">
         <div class="vuch" id="vuL"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <div class="vuch" id="vuR"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
@@ -148,15 +172,11 @@
       <button class="tbtn primary" id="btnPlayPause"><span class="glyph" id="ppGlyph">⏸</span><span id="ppTxt">PAUSE</span></button>
       <button class="tbtn" id="btnFwd10"><span class="glyph">⏩</span>10</button>
       <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph">⏭</span>TAPE</button>
-      <button class="tbtn balloon-btn" id="btnComment" title="Tap = add note at this moment · Hold = show notes">💬</button>
     </div>
 
     <div class="tapebox">
       <div class="tapenav" style="justify-content:center">
         <div class="name" id="listName">—</div>
-      </div>
-      <div class="row" style="margin-bottom:8px; justify-content:center">
-        <button class="smallbtn" id="btnRandom">🎲 SHUFFLE TAPE &amp; TRACK</button>
       </div>
       <div class="list" id="trackList"></div>
     </div>
@@ -228,11 +248,12 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "v2026-10-14.4";
+const APP_VERSION = "v2026-10-14.13";
 
 const state = {
   apiKey: "", clientId: "",
   privRoot: null, pubRoot: null,
+  mode: "public",                     // "public" = only public tapes, "mixed" = private + public
   folders: [], folderIdx: -1,        // each folder: {id, name, origin: "priv"|"pub"}
   files: [], fileIdx: -1,
   comments: [], commentsFileId: null,
@@ -255,18 +276,28 @@ $("btnStart").addEventListener("click", () => { saveSetup(); begin(); });
 $("btnRandom").addEventListener("click", async () => {
   if (!state.folders.length) return begin();
   const idx = Math.floor(Math.random() * state.folders.length);
-  await loadFolder(idx, Math.floor(Math.random() * 1000));
+  await loadFolder(idx, "shuffle");
 });
 $("btnLogin").addEventListener("click", async () => {
   try {
-    state.token = await getToken();
-    saveToken(state.token);
-    await loadFolderList();
-    await loadFolder(state.folderIdx >= 0 ? state.folderIdx : 0);
-    updateBalloon();
-    $("btnLogin").classList.add("hidden");
+    if (!state.token) {
+      state.token = await getToken();
+      saveToken(state.token);
+    }
+    state.mode = "mixed";
+    await refreshTapes();
   } catch (e) { msg("Sign-in failed: " + e.message, false); }
 });
+$("btnMode").addEventListener("click", async () => {
+  state.mode = "public";
+  await refreshTapes();
+});
+async function refreshTapes() {
+  const oldIdx = state.folderIdx;
+  await loadFolderList();
+  await loadFolder(oldIdx >= 0 && oldIdx < state.folders.length ? oldIdx : 0);
+  updateBalloon();
+}
 
 function saveSetup() {
   localStorage.setItem("mlFolder", $("folderUrl").value);
@@ -301,7 +332,7 @@ function fmtTime(s) {
 }
 function trackLen(file) {
   const d = localStorage.getItem("mlDur_" + file.id);
-  return d ? fmtTime(parseInt(d, 10)) : "–:––";
+  return d ? fmtTime(parseInt(d, 10)) : "";
 }
 function rememberLen(file) {
   if (isFinite(audio.duration) && audio.duration > 0)
@@ -350,9 +381,13 @@ function readConfigInputs() {
 }
 function updateBalloon() {
   $("btnComment").classList.toggle("hidden", !state.token);
-  $("accessIcons").textContent = state.token ? "🔒" : "🌐";
-  $("accessIcons").title = state.token ? "Signed in — private & public tapes" : "Public tapes only";
-  $("btnLogin").classList.toggle("hidden", !!state.token);
+  const pub = state.mode === "public" || !state.token;
+  const m = $("btnMode");
+  m.classList.toggle("active", pub);
+  m.textContent = "🌐";
+  m.title = pub ? "Public mode — showing public tapes only" : "Showing all tapes (private & public)";
+  const k = $("btnLogin");
+  k.title = state.token ? "Back to private mode (all tapes)" : "Sign in with Google for private tapes";
 }
 async function begin() {
   readConfigInputs();
@@ -366,12 +401,11 @@ async function begin() {
     await loadFolder(0);
   } catch (e) { msg(e.message, false); }
   updateBalloon();
-  $("btnLogin").classList.toggle("hidden", !!(state.token || !state.privRoot));
 }
 function autoStart() {
   readConfigInputs();
   const tok = getSavedToken();
-  if (tok) { state.token = tok; begin(); return; }
+  if (tok) { state.token = tok; state.mode = "mixed"; begin(); return; }
   if (state.privRoot && state.clientId) { $("loginOverlay").classList.remove("hidden"); return; }
   begin();
 }
@@ -384,7 +418,7 @@ async function loadFolderList() {
     if (!pubs.length) pubs = [{ id: state.pubRoot, name: "Public", modifiedTime: new Date().toISOString() }];
     pubs.forEach((f) => all.push({ ...f, origin: "pub" }));
   }
-  if (state.privRoot && state.token) {
+  if (state.privRoot && state.token && state.mode !== "public") {
     let privs = await listChildren(state.privRoot,
       "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
       "priv", "modifiedTime desc");
@@ -397,14 +431,22 @@ async function loadFolder(idx, startAt) {
   if (!state.folders.length) return;
   state.folderIdx = ((idx % state.folders.length) + state.folders.length) % state.folders.length;
   const folder = state.folders[state.folderIdx];
-  $("listName").textContent = cleanTitle(folder.name) + (folder.origin === "priv" ? " 🔒" : " 🌐");
+  const mixed = state.folders.some((f) => f.origin === "priv") && state.folders.some((f) => f.origin === "pub");
+  $("listName").textContent = cleanTitle(folder.name) + (mixed ? (folder.origin === "priv" ? "  🔒" : "  🌐") : "");
+  $("brandDate").textContent = cleanTitle(folder.name);   // tape/folder date next to the cassette icon
+  $("brandDate").title = folder.name;
   state.files = (await listChildren(folder.id,
     "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
     folder.origin))
     .sort((a, b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));  // newest edit first
   renderTrackList();
   await loadComments(folder);
-  if (state.files.length) await playTrack(startAt != null && startAt < state.files.length ? startAt : 0);
+  if (state.files.length) {
+    let start = 0;
+    if (startAt === "shuffle") start = Math.floor(Math.random() * state.files.length);
+    else if (Number.isInteger(startAt) && startAt >= 0 && startAt < state.files.length) start = startAt;
+    await playTrack(start);
+  }
 }
 function renderTrackList() {
   const el = $("trackList"); el.innerHTML = "";
@@ -418,6 +460,22 @@ function renderTrackList() {
     d.appendChild(span); d.appendChild(len);
     d.onclick = () => playTrack(i);
     el.appendChild(d);
+    if (i === state.fileIdx) {   // seek slider directly under the playing track
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex; align-items:center; gap:8px; padding:2px 10px 8px; font-size:.7rem; color:#8a7c60";
+      const cur = document.createElement("span");
+      cur.id = "miniPos"; cur.textContent = fmtTime(audio.currentTime);
+      const s = document.createElement("input");
+      s.type = "range"; s.id = "miniSeek"; s.min = 0; s.max = 100; s.value = 0; s.style.flex = "1";
+      s.style.accentColor = "#e8c46a"; s.style.height = "4px";
+      const tot = document.createElement("span");
+      tot.id = "miniTot"; tot.textContent = trackLen(f);
+      s.addEventListener("input", () => {
+        if (isFinite(audio.duration)) audio.currentTime = (s.value / 100) * audio.duration;
+      });
+      row.appendChild(cur); row.appendChild(s); row.appendChild(tot);
+      el.appendChild(row);
+    }
   });
 }
 
@@ -426,13 +484,15 @@ async function playTrack(i) {
   const f = state.files[i]; if (!f) return;
   const folder = state.folders[state.folderIdx];
   state.fileIdx = i; renderTrackList();
+  updateTapePiles();
   $("trackName").textContent = cleanTitle(f.name);
-  $("trackDur").textContent = trackLen(f);
+  $("trackDurWrap").textContent = trackLen(f) ? "/ " + trackLen(f) : "";
   try {
     const url = await fetchAudioUrl(f.id, folder.origin);
     audio.src = url;
     await audio.play();
     setPlaying(true);
+    updateMediaSession();
   } catch (e) {
     setPlaying(false);
     msg("Cannot load track (" + (e.message || e) + ").", false);
@@ -464,18 +524,56 @@ audio.addEventListener("ended", () => {
 });
 audio.addEventListener("loadedmetadata", () => {
   if (isFinite(audio.duration)) {
-    $("trackDur").textContent = fmtTime(audio.duration);
+    $("trackDurWrap").textContent = "/ " + fmtTime(audio.duration);
     rememberLen(state.files[state.fileIdx]);
     renderTrackList();
   }
 });
+/* ---------- Tape progress: pile moves from left reel to right reel ---------- */
+function tapeProgress() {
+  const n = state.files.length;
+  if (!n) return 0;
+  const cur = isFinite(audio.duration) && audio.duration > 0 ? audio.currentTime / audio.duration : 0;
+  return Math.min(1, (Math.max(0, state.fileIdx) + cur) / n);
+}
+function updateTapePiles() {
+  const p = tapeProgress();
+  $("pileL").style.setProperty("--d", (36 + (1 - p) * 54) + "px");  // supply reel empties
+  $("pileR").style.setProperty("--d", (36 + p * 54) + "px");        // take-up reel fills
+}
 audio.addEventListener("timeupdate", () => {
   $("trackPos").textContent = fmtTime(audio.currentTime);
+  const ms = $("miniSeek");
+  if (ms && isFinite(audio.duration)) ms.value = (audio.currentTime / audio.duration) * 100;
+  const mp = $("miniPos");
+  if (mp) mp.textContent = fmtTime(audio.currentTime);
   if (isFinite(audio.duration)) $("seek").value = (audio.currentTime / audio.duration) * 100;
+  updateTapePiles();
 });
-$("seek").addEventListener("input", (e) => {
+$("seek") && $("seek").addEventListener("input", (e) => {
   if (isFinite(audio.duration)) audio.currentTime = (e.target.value / 100) * audio.duration;
 });
+
+/* ---------- Media Session: keep playing with screen off / other apps ---------- */
+function updateMediaSession() {
+  if (!("mediaSession" in navigator)) return;
+  const f = state.files[state.fileIdx];
+  if (!f) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: cleanTitle(f.name),
+    artist: cleanTitle(state.folders[state.folderIdx] ? state.folders[state.folderIdx].name : ""),
+    album: CONFIG.tenant || "Moly",
+  });
+  navigator.mediaSession.setActionHandler("play", () => { audio.play(); setPlaying(true); });
+  navigator.mediaSession.setActionHandler("pause", () => { audio.pause(); setPlaying(false); });
+  navigator.mediaSession.setActionHandler("previoustrack", () => {
+    (state.fileIdx > 0) ? playTrack(state.fileIdx - 1) : stepTape(-1);
+  });
+  navigator.mediaSession.setActionHandler("nexttrack", () => {
+    (state.fileIdx < state.files.length - 1) ? playTrack(state.fileIdx + 1) : stepTape(1);
+  });
+  try { navigator.mediaSession.setActionHandler("seekto", (d) => { if (d.seekTime != null) audio.currentTime = d.seekTime; }); } catch (e) {}
+}
 $("btnPlayPause").addEventListener("click", () => {
   if (!audio.src) return;
   if (audio.paused) { audio.play(); setPlaying(true); }
@@ -483,13 +581,23 @@ $("btnPlayPause").addEventListener("click", () => {
 });
 $("btnBack10").addEventListener("click", () => audio.currentTime = Math.max(0, audio.currentTime - 10));
 $("btnFwd10").addEventListener("click", () => audio.currentTime = Math.min(audio.duration || 1e9, audio.currentTime + 10));
-$("btnPrevList").addEventListener("click", () => loadFolder(state.folderIdx - 1));
-$("btnNextList").addEventListener("click", () => loadFolder(state.folderIdx + 1));
+$("btnPrevList").addEventListener("click", () => stepTape(-1));
+$("btnNextList").addEventListener("click", () => stepTape(1));
+async function stepTape(dir) {
+  // Meerdere tapes: wissel van tape. Eén tape: gebruik als vorige/volgende nummer.
+  if (state.folders.length > 1) return loadFolder(state.folderIdx + dir);
+  if (state.files.length < 2) return;
+  const next = state.fileIdx + dir;
+  if (next >= 0 && next < state.files.length) await playTrack(next);
+}
 
 /* ---------- VU meter (true stereo: splitter + 2 analysers) ---------- */
 let vuRaf = null;
 function startVU() {
   if (vuRaf) return;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (isIOS) return;  // iOS suspends WebAudio when the page hides; audio must stay on the element
   try {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
@@ -697,6 +805,7 @@ $("btnDoLogin").addEventListener("click", async () => {
     saveSetup();
     state.token = await getToken();
     saveToken(state.token);
+    state.mode = "mixed";
     begin();
   } catch (e) { msg("Sign-in failed: " + e.message, false); }
 });
@@ -704,8 +813,12 @@ $("btnPubOnly").addEventListener("click", () => { saveSetup(); begin(); });
 
 (function init() {
   $("versionTag").textContent = APP_VERSION;
-  const t = CONFIG.tenant && !CONFIG.tenant.startsWith("HIER-JOUW-") ? CONFIG.tenant : "";
-  if (t) { $("tenantName").textContent = t; $("loginTenant").textContent = t; }
+  const t = CONFIG.tenant && !CONFIG.tenant.startsWith("HIER-JOUW-") ? CONFIG.tenant : "moly";
+  $("loginTenant").textContent = t;
+  document.title = t;                                   // tab title = tenant; Moly is the engine
+  const manifest = JSON.parse(decodeURIComponent(document.querySelector("link[rel=manifest]").href.replace(/^data:application\/manifest\+json,/, "")));
+  manifest.name = t; manifest.short_name = t;
+  document.querySelector("link[rel=manifest]").href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
   const filled = ($("folderUrl").value.trim() && !$("folderUrl").value.includes("HIER-JOUW-")) ||
                 ($("publicFolderUrl").value.trim() && !$("publicFolderUrl").value.includes("HIER-JOUW-"));
   if (filled) autoStart();
