@@ -27,71 +27,76 @@
   .settingsbtn { background:none; border:1px solid #6a5c44; color:#cdbf9c; border-radius:6px;
                  padding:4px 8px; cursor:pointer; font:inherit; font-size:.75rem; }
   .settingsbtn:active { transform:translateY(1px); }
-  .iconbtn { background:none; border:1px solid #6a5c44; border-radius:6px; padding:3px 7px;
-             cursor:pointer; font:inherit; font-size:.95rem; color:#8a7c60; line-height:1.2; }
-  .iconbtn.active { color:#5aa5e0; border-color:#3a5a75; box-shadow:0 0 6px rgba(90,165,224,.35); }
-  .iconbtn:disabled { opacity:.3; cursor:default; }
+  .iconbtn { background:none; border:none; border-radius:6px; padding:2px 5px;
+             cursor:pointer; font:inherit; font-size:1rem; color:#8a7c60; line-height:1.3; }
+  .iconbtn.active { color:#5aa5e0; text-shadow:0 0 7px rgba(90,165,224,.5); }
+  .iconbtn:disabled { opacity:.22; cursor:default; }
   .iconbtn:active { transform:translateY(1px); }
 
   /* ---------- Cassette window ---------- */
-  .cassette { background:linear-gradient(180deg,#161310,#0d0b08);
-              border-radius:12px; padding:16px 16px 14px; box-shadow:inset 0 2px 8px #000;
+  .cassette { position:relative; overflow:hidden;
+              background:linear-gradient(180deg,#161310,#0d0b08);
+              border-radius:12px; padding:14px 16px 12px; box-shadow:inset 0 2px 8px #000;
               border:3px solid #4d4433; outline:1px solid #000; }
-  .tape-label { background:linear-gradient(180deg,#f4ecd7,#e2d6b8); color:#3a3020; border-radius:4px;
-                padding:7px 12px; text-align:center; font-size:1.05rem; font-weight:700; letter-spacing:.04em;
-                overflow-wrap:anywhere; margin-bottom:6px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
-  .counter { position:relative; text-align:center; color:#c46a2b; font-size:1rem; letter-spacing:.2em;
-             text-shadow:0 0 6px rgba(255,120,30,.55); margin-bottom:2px; }
-  .counter .dur { color:#8a7c60; letter-spacing:.05em; text-shadow:none; }
-  .counter .iconbtn { position:absolute; right:0; top:50%; transform:translateY(-50%); letter-spacing:0;
-                      border:none; background:none; padding:2px; }
-  .reelbay { position:relative; height:132px; margin:16px 0 8px; }
-  .reel { position:absolute; top:50%; transform:translateY(-50%); width:104px; height:104px; border-radius:50%;
+  .cassette > * { position:relative; z-index:5; }
+  .reel { position:absolute; top:50%; left:25%; z-index:1;
+          transform:translate(-50%,-50%); width:190px; height:190px; border-radius:50%;
           background:radial-gradient(circle,#e5d9b8 0%,#c9b98a 40%,#8f7d52 100%);
-          border:6px solid #2a2318; box-shadow:0 2px 8px #000, inset 0 0 0 1px rgba(255,240,200,.25); }
-  .reel.left { left:calc(25% - 52px); }
-  .reel.right { left:calc(75% - 52px); }
-  .reel::before, .reel::after { display:none; }
-  .reel .pile { position:absolute; inset:0; margin:auto; width:var(--d,50px); height:var(--d,50px);
-                border-radius:50%; background:radial-gradient(circle at 35% 30%,#4a2f1c,#2a1a10 70%);
-                box-shadow:inset 0 0 4px rgba(0,0,0,.6); transition:width .4s, height .4s; }
-  .reel .hub { position:absolute; inset:0; margin:auto; width:28px; height:28px; border-radius:50%; z-index:4;
-               background:conic-gradient(#d8d8de,#9a9aa2,#e2e2e8,#8a8a92,#d8d8de);
-               border:2px solid #55555e; box-shadow:0 1px 3px #000; }
-  .taperoad { position:absolute; top:50%; transform:translateY(-50%);
-               left:calc(25% + 58px); right:calc(25% + 58px);
-               display:flex; align-items:center; justify-content:center; gap:6px; }
-  .strip { height:12px; flex:1; border-radius:2px;
-           background:linear-gradient(180deg,#4a2f1c,#2a1a10); box-shadow:0 1px 2px #000; }
+          border:7px solid #2a2318; box-shadow:0 2px 8px #000, inset 0 0 0 1px rgba(255,240,200,.25); }
+  .reel.right { left:75%; }
   .spin { animation:spin 3.2s linear infinite; }
   @keyframes spin {
-    from { transform:translateY(-50%) rotate(0deg); }
-    to   { transform:translateY(-50%) rotate(360deg); }
+    from { transform:translate(-50%,-50%) rotate(0deg); }
+    to   { transform:translate(-50%,-50%) rotate(360deg); }
   }
-  .cassette .pile { z-index:1; }
-  input[type=range] { width:100%; accent-color:#e8c46a; margin-top:8px; }
+  .reel .pile { position:absolute; inset:0; margin:auto; width:var(--d,90px); height:var(--d,90px);
+                border-radius:50%; background:radial-gradient(circle at 35% 30%,#4a2f1c,#2a1a10 70%);
+                box-shadow:inset 0 0 4px rgba(0,0,0,.6); transition:width .4s, height .4s; }
+  .reel .hub { position:absolute; inset:0; margin:auto; width:36px; height:36px; border-radius:50%; z-index:4;
+               background:conic-gradient(#d8d8de,#9a9aa2,#e2e2e8,#8a8a92,#d8d8de);
+               border:3px solid #55555e; box-shadow:0 1px 3px #000; }
+  .tape-label { background:linear-gradient(180deg,#f4ecd7,#e2d6b8); color:#3a3020; border-radius:4px;
+                padding:6px 10px; text-align:center; font-size:.9rem; font-weight:700; letter-spacing:.04em;
+                overflow-wrap:anywhere; margin-bottom:5px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
+  .track-label { background:linear-gradient(180deg,#efd9a0,#e0c178); color:#3a2f14; border-radius:4px;
+                 padding:6px 10px; text-align:center; font-size:1.05rem; font-weight:700; letter-spacing:.03em;
+                 overflow-wrap:anywhere; margin-bottom:6px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
+  .counter { position:relative; text-align:center; color:#c46a2b; font-size:1rem; letter-spacing:.2em;
+             text-shadow:0 0 6px rgba(255,120,30,.55); margin-bottom:2px; background:none; }
+  .counter .dur { color:#8a7c60; letter-spacing:.05em; text-shadow:none; }
+  .counter .iconbtn { position:absolute; right:0; top:50%; transform:translateY(-50%); letter-spacing:0;
+                      border:none; background:none; padding:2px; font-size:.75rem; }
+  .track { position:relative; }
+          background:radial-gradient(circle,#e5d9b8 0%,#c9b98a 40%,#8f7d52 100%);
+          border:6px solid #2a2318; box-shadow:0 2px 8px #000, inset 0 0 0 1px rgba(255,240,200,.25); }
+  input[type=range] { width:100%; accent-color:#e8c46a; }
 
   /* ---------- VU meter ---------- */
   .vu { display:flex; justify-content:center; gap:10px; margin-top:10px; }
   .vuch { display:flex; gap:3px; align-items:flex-end; height:44px; padding:5px 7px;
-          background:linear-gradient(180deg,#161310,#0d0b08); border:1px solid #000;
+          background:rgba(13,11,8,.72); border:1px solid #000;
           border-radius:6px; box-shadow:inset 0 2px 6px #000; }
   .vuch span { width:5px; height:5px; border-radius:1px; background:#3a2f1a; transition:background .08s, height .08s; }
   .vuch span.on { background:#e8c46a; }
   .vuch span:nth-last-child(1).on, .vuch span:nth-last-child(2).on { background:#e06a2b; }
   .vuch span:nth-last-child(1).on { background:#d94f3d; }
+  .vuch.rev { flex-direction:row-reverse; }
+  .vuch.rev span:nth-child(1).on { background:#d94f3d; }
+  .vuch.rev span:nth-child(2).on { background:#e06a2b; }
 
-  /* ---------- Transport buttons ---------- */
-  .transport { display:flex; justify-content:center; gap:12px; margin-top:14px; }
-  .tbtn { font:inherit; font-size:.7rem; letter-spacing:.05em; color:#e8e2d4; cursor:pointer;
-          background:linear-gradient(180deg,#57503f,#39332a); border:1px solid #6a5c44;
-          border-radius:8px; padding:10px 8px; min-width:52px; text-align:center;
-          box-shadow:0 4px 0 #191510, inset 0 1px 0 rgba(255,240,200,.22);
+  /* ---------- Transport buttons (classic deck) ---------- */
+  .transport { display:flex; justify-content:center; gap:4px; margin-top:14px; }
+  .tbtn { font:inherit; font-size:.62rem; letter-spacing:.1em; color:#e8e2d4; cursor:pointer;
+          background:linear-gradient(180deg,#4e4739 0%,#39332a 45%,#2c2720 55%,#453d2f 100%);
+          border:1px solid #191510; border-radius:3px; padding:9px 12px 8px; min-width:58px; text-align:center;
+          box-shadow:0 3px 0 #14100b, inset 0 1px 0 rgba(255,240,200,.28);
           user-select:none; }
-  .tbtn:active { transform:translateY(3px); box-shadow:0 1px 0 #191510; }
-  .tbtn .glyph { display:block; font-size:1.35rem; line-height:1; margin-bottom:3px; color:#e8c46a; }
-  .tbtn.primary { background:linear-gradient(180deg,#7a5f22,#5c4718); border-color:#a8842e; }
-  .tbtn.balloon-btn { min-width:52px; }
+  .tbtn:active { transform:translateY(2px); box-shadow:0 1px 0 #14100b; }
+  .tbtn .glyph { display:block; font-size:1.15rem; line-height:1.1; margin-bottom:2px; color:#e8c46a;
+                 text-shadow:0 1px 1px #000; }
+  .tbtn.primary { background:linear-gradient(180deg,#8a6a26 0%,#5c4718 45%,#4a3812 55%,#7a5f22 100%); }
+  .tbtn:disabled { opacity:.3; cursor:default; }
+  .tbtn:disabled:active { transform:none; box-shadow:0 3px 0 #14100b; }
 
   /* ---------- Playlist / tape select ---------- */
   .tapebox { margin-top:14px; }
@@ -108,6 +113,8 @@
   .track:hover { background:#241f15; }
   .track.active { background:#33280f; color:#e8c46a; }
   .track .len { color:#776b52; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .minislider { position:absolute; left:10px; right:10px; bottom:1px; width:calc(100% - 20px);
+                height:14px; accent-color:#e8c46a; cursor:pointer; }
   .hidden { display:none !important; }
 
   /* ---------- Sheets / overlays ---------- */
@@ -142,39 +149,36 @@
     <div class="brandbar">
       <div class="brand" style="align-items:center; display:flex; gap:8px">
         <img alt="cassette" style="width:22px; height:22px; display:block" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
-        <span id="brandDate" style="letter-spacing:.02em; font-size:.9rem">Mono Lisa</span>
+        <span id="brandDate" style="letter-spacing:.02em; font-size:.9rem">mono lisa</span>
       </div>
       <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px">
         <div style="display:flex; gap:6px; align-items:center">
           <button class="iconbtn" id="btnLogin" title="Sign in for private tapes">🔑</button>
           <button class="iconbtn" id="btnMode" title="Access mode">🌐</button>
-          <button class="iconbtn" id="btnRandom" title="Shuffle tape &amp; track">🎲</button>
-          <button class="iconbtn" id="btnSettings" title="Settings" style="font-size:1.05rem">⚙</button>
+          <button class="iconbtn" id="btnRandom" title="Shuffle on/off">🎲</button>
+          <button class="iconbtn" id="btnSettings" title="Settings" style="font-size:1.6rem">⚙</button>
         </div>
         <span id="versionTag" style="font-size:.6rem; color:#7a6c4d; letter-spacing:.05em"></span>
       </div>
     </div>
 
     <div class="cassette">
-      <div class="tape-label" id="trackName">—</div>
-      <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span> <button class="iconbtn" id="btnComment" style="font-size:.7rem; vertical-align:middle" title="Tap = add note at this moment · Hold = show notes">💬</button></div>
-      <div class="reelbay" id="reels">
-        <div class="reel left"><div class="pile" id="pileL"></div><div class="hub"></div></div>
-        <div class="taperoad"><div class="strip"></div></div>
-        <div class="reel right"><div class="pile" id="pileR"></div><div class="hub"></div></div>
-      </div>
+      <div class="reel" id="reelL"><div class="pile" id="pileL"></div><div class="hub"></div></div>
+      <div class="reel right" id="reelR"><div class="pile" id="pileR"></div><div class="hub"></div></div>
+      <div class="tape-label" id="tapeName">—</div>
+      <div class="track-label" id="trackName">—</div>
+      <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span> <button class="iconbtn" id="btnComment" title="Tap = add note at this moment · Hold = show notes">💬</button></div>
       <div class="vu" id="vu">
-        <div class="vuch" id="vuL"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="vuch rev" id="vuL"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <div class="vuch" id="vuR"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       </div>
     </div>
 
     <div class="transport">
       <button class="tbtn" id="btnPrevList" title="Previous tape"><span class="glyph">⏮</span>TAPE</button>
-      <button class="tbtn" id="btnBack10"><span class="glyph">⏪</span>10</button>
       <button class="tbtn primary" id="btnPlayPause"><span class="glyph" id="ppGlyph">⏸</span><span id="ppTxt">PAUSE</span></button>
-      <button class="tbtn" id="btnFwd10"><span class="glyph">⏩</span>10</button>
       <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph">⏭</span>TAPE</button>
+      <button class="tbtn" id="btnEject" title="Eject"><span class="glyph">⏏</span>EJECT</button>
     </div>
 
     <div class="tapebox">
@@ -254,12 +258,13 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.2";
+const APP_VERSION = "1.4";
 
 const state = {
   apiKey: "", clientId: "",
   privRoot: null, pubRoot: null,
   mode: "public",                     // "public" = only public tapes, "mixed" = private + public
+  shuffle: false,
   folders: [], folderIdx: -1,        // each folder: {id, name, origin: "priv"|"pub"}
   files: [], fileIdx: -1,
   comments: [], commentsFileId: null,
@@ -280,9 +285,12 @@ for (const [k, id, cfg] of [
 }
 $("btnStart").addEventListener("click", () => { saveSetup(); begin(); });
 $("btnRandom").addEventListener("click", async () => {
-  if (!state.folders.length) return begin();
-  const idx = Math.floor(Math.random() * state.folders.length);
-  await loadFolder(idx, "shuffle");
+  state.shuffle = !state.shuffle;                     // toggle, default off
+  updateBalloon();
+  if (state.shuffle && state.folders.length) {
+    const idx = Math.floor(Math.random() * state.folders.length);
+    await loadFolder(idx, "shuffle");
+  }
 });
 $("btnLogin").addEventListener("click", async () => {
   try {
@@ -290,12 +298,13 @@ $("btnLogin").addEventListener("click", async () => {
       state.token = await getToken();
       saveToken(state.token);
     }
-    state.mode = "mixed";
+    state.mode = "mixed";   // key = private mode
     await refreshTapes();
   } catch (e) { msg("Sign-in failed: " + e.message, false); }
 });
 $("btnMode").addEventListener("click", async () => {
-  state.mode = "public";
+  if (!state.token) return;
+  state.mode = state.mode === "public" ? "mixed" : "public";  // globe toggles public/private
   await refreshTapes();
 });
 async function refreshTapes() {
@@ -388,15 +397,14 @@ function readConfigInputs() {
 }
 function updateBalloon() {
   $("btnComment").classList.toggle("hidden", !state.token);
-  const m = $("btnMode");
-  m.classList.toggle("active", state.mode === "public" || !state.token);
-  m.disabled = !!state.token;                     // signed in → private mode is on, globe disabled
-  m.title = state.token ? "Signed in — showing your private tapes" :
-            (state.mode === "public" ? "Public mode — public tapes only" : "Public tapes");
-  const k = $("btnLogin");
-  k.disabled = !!(state.token && state.mode !== "public");   // already where the key leads
-  k.title = state.token ? "Back to private mode (all tapes)" : "Sign in with Google for private tapes";
-  $("btnRandom").disabled = state.folders.length < 2;       // shuffle needs more than one tape
+  const pub = !state.token || state.mode === "public";
+  const m = $("btnMode"), k = $("btnLogin");
+  m.classList.toggle("active", pub);              // globe on = public tapes
+  m.disabled = !state.token;                     // no sign-in → public is all there is
+  k.classList.toggle("active", !!state.token && !pub);  // key on = private mode (inverse of globe)
+  $("btnRandom").classList.toggle("active", state.shuffle);
+  m.title = pub ? "Public mode — public tapes" : "Private mode";
+  k.title = state.token ? "Private mode" : "Sign in with Google for private tapes";
 }
 async function begin() {
   readConfigInputs();
@@ -444,22 +452,30 @@ async function loadFolderList() {
     privs.forEach((f) => all.push({ ...f, origin: "priv" }));
   }
   state.folders = all;
-  $("btnRandom").disabled = all.length < 2;
+  updateBalloon();
 }
 async function loadFolder(idx, startAt) {
   if (!state.folders.length) return;
   state.folderIdx = ((idx % state.folders.length) + state.folders.length) % state.folders.length;
   const folder = state.folders[state.folderIdx];
-  $("brandDate").textContent = cleanTitle(folder.name);   // tape/folder next to the cassette icon
-  $("brandDate").title = folder.name;
+  $("brandDate").textContent = "mono lisa";   // brand name, always
+  $("tapeName").textContent = cleanTitle(folder.name);    // sticker 1: folder/tape name
   $("btnPrevList").disabled = state.folderIdx <= 0 && state.folders.length <= 1;
   $("btnNextList").disabled = state.folderIdx >= state.folders.length - 1 && state.folders.length > 1;
   $("btnPrevList").classList.toggle("hidden", state.folders.length <= 1);
   $("btnNextList").classList.toggle("hidden", state.folders.length <= 1);
-  state.files = (await listChildren(folder.id,
+  const mixed = (await listChildren(folder.id,
     "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
     folder.origin))
     .sort((a, b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));  // newest edit first
+  // Multiple versions of the same song (name, + and +- suffixes): keep only the last-modified one
+  const seen = new Set();
+  state.files = mixed.filter((f) => {
+    const key = f.name.replace(/\.[^.]+$/, "").split("+")[0].trim().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   renderTrackList();
   await loadComments(folder);
   if (state.files.length) {
@@ -479,24 +495,23 @@ function renderTrackList() {
     const len = document.createElement("span");
     len.className = "len"; len.textContent = trackLen(f);
     d.appendChild(span); d.appendChild(len);
-    d.onclick = () => playTrack(i);
-    el.appendChild(d);
-    if (i === state.fileIdx) {   // seek slider directly under the playing track
-      const row = document.createElement("div");
-      row.style.cssText = "display:flex; align-items:center; gap:8px; padding:2px 10px 8px; font-size:.7rem; color:#8a7c60";
-      const cur = document.createElement("span");
-      cur.id = "miniPos"; cur.textContent = fmtTime(audio.currentTime);
+    if (i !== state.fileIdx) {
+      d.onclick = () => playTrack(i);
+    } else {
+      /* Active track: tap (or hover on desktop) reveals the seek slider at the bottom edge */
       const s = document.createElement("input");
-      s.type = "range"; s.id = "miniSeek"; s.min = 0; s.max = 100; s.value = 0; s.style.flex = "1";
-      s.style.accentColor = "#e8c46a"; s.style.height = "4px";
-      const tot = document.createElement("span");
-      tot.id = "miniTot"; tot.textContent = trackLen(f);
+      s.type = "range"; s.id = "miniSeek"; s.min = 0; s.max = 100; s.value = 0;
+      s.className = "minislider hidden";
       s.addEventListener("input", () => {
         if (isFinite(audio.duration)) audio.currentTime = (s.value / 100) * audio.duration;
       });
-      row.appendChild(cur); row.appendChild(s); row.appendChild(tot);
-      el.appendChild(row);
+      s.addEventListener("click", (e) => e.stopPropagation());
+      d.appendChild(s);
+      d.onclick = () => s.classList.toggle("hidden");              // mobile: tap the title
+      d.addEventListener("mouseenter", () => s.classList.remove("hidden"));
+      d.addEventListener("mouseleave", () => s.classList.add("hidden"));
     }
+    el.appendChild(d);
   });
 }
 
@@ -540,7 +555,9 @@ function setPlaying(p) {
   document.querySelectorAll(".reel").forEach((r) => r.classList.toggle("spin", p));
 }
 audio.addEventListener("ended", () => {
-  if (state.fileIdx < state.files.length - 1) playTrack(state.fileIdx + 1);
+  if (state.shuffle && state.files.length) {                 // shuffle mode: random next track
+    playTrack(Math.floor(Math.random() * state.files.length));
+  } else if (state.fileIdx < state.files.length - 1) playTrack(state.fileIdx + 1);
   else if (state.folderIdx < state.folders.length - 1) loadFolder(state.folderIdx + 1);
 });
 audio.addEventListener("loadedmetadata", () => {
@@ -559,20 +576,17 @@ function tapeProgress() {
 }
 function updateTapePiles() {
   const p = tapeProgress();
-  // Left reel starts full and empties; right reel fills. Strong contrast so the move is clearly visible.
-  $("pileL").style.setProperty("--d", (32 + (1 - p) * 52) + "px");  // supply reel empties
-  $("pileR").style.setProperty("--d", (32 + p * 52) + "px");        // take-up reel fills
+  // Left reel starts full and empties; right reel fills. Big reels → big piles, clearly visible.
+  $("pileL").style.setProperty("--d", (56 + (1 - p) * 96) + "px");  // supply reel empties
+  $("pileR").style.setProperty("--d", (56 + p * 96) + "px");        // take-up reel fills
 }
 audio.addEventListener("timeupdate", () => {
   $("trackPos").textContent = fmtTime(audio.currentTime);
   const ms = $("miniSeek");
   if (ms && isFinite(audio.duration)) ms.value = (audio.currentTime / audio.duration) * 100;
-  const mp = $("miniPos");
-  if (mp) mp.textContent = fmtTime(audio.currentTime);
-  if (isFinite(audio.duration)) { const sk = $("seek"); if (sk) sk.value = (audio.currentTime / audio.duration) * 100; }
   updateTapePiles();
 });
-$("seek") && $("seek").addEventListener("input", (e) => {
+$("miniSeek") && $("miniSeek").addEventListener("input", (e) => {
   if (isFinite(audio.duration)) audio.currentTime = (e.target.value / 100) * audio.duration;
 });
 
@@ -601,8 +615,11 @@ $("btnPlayPause").addEventListener("click", () => {
   if (audio.paused) { audio.play(); setPlaying(true); }
   else { audio.pause(); setPlaying(false); }
 });
-$("btnBack10").addEventListener("click", () => audio.currentTime = Math.max(0, audio.currentTime - 10));
-$("btnFwd10").addEventListener("click", () => audio.currentTime = Math.min(audio.duration || 1e9, audio.currentTime + 10));
+$("btnEject").addEventListener("click", () => {
+  audio.pause(); setPlaying(false);
+  audio.currentTime = 0;
+  msg("⏏ Ejected. (Surprise coming soon…)", true);
+});
 $("btnPrevList").addEventListener("click", () => stepTape(-1));
 $("btnNextList").addEventListener("click", () => stepTape(1));
 async function stepTape(dir) {
