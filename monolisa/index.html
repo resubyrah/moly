@@ -30,13 +30,17 @@
   .iconbtn { background:none; border:none; border-radius:6px; padding:2px 5px;
              cursor:pointer; font:inherit; font-size:1rem; color:#8a7c60; line-height:1.3; }
   .iconbtn.active { color:#5aa5e0; text-shadow:0 0 7px rgba(90,165,224,.5); }
-  .iconbtn:disabled { opacity:.22; cursor:default; }
+  .iconbtn:disabled { opacity:.15; cursor:default; }
   .iconbtn:active { transform:translateY(1px); }
+  /* Emoji buttons ignore font-color: use grayscale/dim for OFF, full colour + glow for ON */
+  #btnLogin, #btnMode, #btnRandom { filter:grayscale(1); opacity:.45; transition:filter .2s, opacity .2s; }
+  #btnLogin.active, #btnMode.active, #btnRandom.active { filter:none; opacity:1; text-shadow:0 0 8px rgba(232,196,106,.65); }
+  #btnLogin:disabled, #btnMode:disabled, #btnRandom:disabled { filter:grayscale(1); opacity:.15; }
 
   /* ---------- Cassette window ---------- */
   .cassette { position:relative; overflow:hidden;
               background:linear-gradient(180deg,#161310,#0d0b08);
-              border-radius:12px; padding:14px 16px 12px; box-shadow:inset 0 2px 8px #000;
+              border-radius:12px; padding:10px 14px 8px; box-shadow:inset 0 2px 8px #000;
               border:3px solid #4d4433; outline:1px solid #000; }
   .cassette > * { position:relative; z-index:5; }
   .reel { position:absolute; top:50%; left:25%; z-index:1;
@@ -56,11 +60,8 @@
                background:conic-gradient(#d8d8de,#9a9aa2,#e2e2e8,#8a8a92,#d8d8de);
                border:3px solid #55555e; box-shadow:0 1px 3px #000; }
   .tape-label { background:linear-gradient(180deg,#f4ecd7,#e2d6b8); color:#3a3020; border-radius:4px;
-                padding:6px 10px; text-align:center; font-size:.9rem; font-weight:700; letter-spacing:.04em;
-                overflow-wrap:anywhere; margin-bottom:5px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
-  .track-label { background:linear-gradient(180deg,#efd9a0,#e0c178); color:#3a2f14; border-radius:4px;
-                 padding:6px 10px; text-align:center; font-size:1.05rem; font-weight:700; letter-spacing:.03em;
-                 overflow-wrap:anywhere; margin-bottom:6px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
+                padding:5px 10px; text-align:center; font-size:.9rem; font-weight:700; letter-spacing:.04em;
+                overflow-wrap:anywhere; margin-bottom:4px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
   .counter { position:relative; text-align:center; color:#c46a2b; font-size:1rem; letter-spacing:.2em;
              text-shadow:0 0 6px rgba(255,120,30,.55); margin-bottom:2px; background:none; }
   .counter .dur { color:#8a7c60; letter-spacing:.05em; text-shadow:none; }
@@ -72,7 +73,7 @@
   input[type=range] { width:100%; accent-color:#e8c46a; }
 
   /* ---------- VU meter ---------- */
-  .vu { display:flex; justify-content:center; gap:10px; margin-top:10px; }
+  .vu { display:flex; justify-content:center; gap:10px; margin-top:6px; }
   .vuch { display:flex; gap:3px; align-items:flex-end; height:44px; padding:5px 7px;
           background:rgba(13,11,8,.72); border:1px solid #000;
           border-radius:6px; box-shadow:inset 0 2px 6px #000; }
@@ -80,9 +81,7 @@
   .vuch span.on { background:#e8c46a; }
   .vuch span:nth-last-child(1).on, .vuch span:nth-last-child(2).on { background:#e06a2b; }
   .vuch span:nth-last-child(1).on { background:#d94f3d; }
-  .vuch.rev { flex-direction:row-reverse; }
-  .vuch.rev span:nth-child(1).on { background:#d94f3d; }
-  .vuch.rev span:nth-child(2).on { background:#e06a2b; }
+  .vuch.rev { flex-direction:row-reverse; }   /* hot segments (nth-last-child) end up left */
 
   /* ---------- Transport buttons (classic deck) ---------- */
   .transport { display:flex; justify-content:center; gap:4px; margin-top:14px; }
@@ -113,8 +112,8 @@
   .track:hover { background:#241f15; }
   .track.active { background:#33280f; color:#e8c46a; }
   .track .len { color:#776b52; font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .minislider { position:absolute; left:10px; right:10px; bottom:1px; width:calc(100% - 20px);
-                height:14px; accent-color:#e8c46a; cursor:pointer; }
+  .minislider { position:absolute; left:10px; right:10px; bottom:-3px; width:calc(100% - 20px);
+                height:12px; accent-color:#e8c46a; cursor:pointer; }
   .hidden { display:none !important; }
 
   /* ---------- Sheets / overlays ---------- */
@@ -166,7 +165,6 @@
       <div class="reel" id="reelL"><div class="pile" id="pileL"></div><div class="hub"></div></div>
       <div class="reel right" id="reelR"><div class="pile" id="pileR"></div><div class="hub"></div></div>
       <div class="tape-label" id="tapeName">—</div>
-      <div class="track-label" id="trackName">—</div>
       <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span> <button class="iconbtn" id="btnComment" title="Tap = add note at this moment · Hold = show notes">💬</button></div>
       <div class="vu" id="vu">
         <div class="vuch rev" id="vuL"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
@@ -258,7 +256,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.4";
+const APP_VERSION = "1.5";
 
 const state = {
   apiKey: "", clientId: "",
@@ -521,7 +519,6 @@ async function playTrack(i) {
   const folder = state.folders[state.folderIdx];
   state.fileIdx = i; renderTrackList();
   updateTapePiles();
-  $("trackName").textContent = cleanTitle(f.name);
   $("trackDurWrap").textContent = trackLen(f) ? "/ " + trackLen(f) : "";
   try {
     const url = await fetchAudioUrl(f.id, folder.origin);
@@ -618,7 +615,7 @@ $("btnPlayPause").addEventListener("click", () => {
 $("btnEject").addEventListener("click", () => {
   audio.pause(); setPlaying(false);
   audio.currentTime = 0;
-  msg("⏏ Ejected. (Surprise coming soon…)", true);
+  msg("⏏ Bye", true);
 });
 $("btnPrevList").addEventListener("click", () => stepTape(-1));
 $("btnNextList").addEventListener("click", () => stepTape(1));
@@ -730,7 +727,8 @@ balloon.addEventListener("pointerdown", () => {
 balloon.addEventListener("click", () => { if (!held) openCommentInput(); });
 function openCommentInput() {
   if (!audio.src) return;
-  $("inputAt").textContent = "at " + fmtTime(audio.currentTime) + " in " + $("trackName").textContent;
+  $("inputAt").textContent = "at " + fmtTime(audio.currentTime) + " in " +
+    (state.files[state.fileIdx] ? cleanTitle(state.files[state.fileIdx].name) : "");
   $("commentText").value = "";
   $("inputOverlay").classList.remove("hidden");
   setTimeout(() => $("commentText").focus(), 50);
