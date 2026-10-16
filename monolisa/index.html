@@ -36,6 +36,8 @@
   #btnLogin, #btnMode, #btnRandom { filter:grayscale(1); opacity:.45; transition:filter .2s, opacity .2s; }
   #btnLogin.active, #btnMode.active, #btnRandom.active { filter:none; opacity:1; text-shadow:0 0 8px rgba(232,196,106,.65); }
   #btnLogin:disabled, #btnMode:disabled, #btnRandom:disabled { filter:grayscale(1); opacity:.15; }
+  #searchResults .track { cursor:pointer; }
+  #searchResults .track.active { border-color:#e8c46a; background:rgba(232,196,106,.12); }
 
   /* ---------- Cassette window ---------- */
   .cassette { position:relative; overflow:hidden;
@@ -98,7 +100,10 @@
   .tbtn:disabled:active { transform:none; box-shadow:0 3px 0 #14100b; }
 
   /* ---------- Playlist / tape select ---------- */
-  .tapebox { margin-top:14px; }
+  .tapebox { margin-top:14px; padding:12px 14px;
+             background:linear-gradient(180deg,#26221a,#1c1913);
+             border:2px solid #4d4433; outline:1px solid #000; border-radius:14px;
+             box-shadow:0 6px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,240,200,.12); }
   .tapenav { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
   .tapenav .name { text-align:center; font-size:.85rem; color:#cdbf9c; letter-spacing:.06em;
                    overflow-wrap:anywhere; flex:1; }
@@ -155,6 +160,7 @@
           <button class="iconbtn" id="btnLogin" title="Sign in for private tapes">🔑</button>
           <button class="iconbtn" id="btnMode" title="Access mode">🌐</button>
           <button class="iconbtn" id="btnRandom" title="Shuffle on/off">🎲</button>
+          <button class="iconbtn" id="btnSearch" title="Search track">🔍</button>
           <button class="iconbtn" id="btnSettings" title="Settings" style="font-size:1.6rem">⚙</button>
         </div>
         <span id="versionTag" style="font-size:.6rem; color:#7a6c4d; letter-spacing:.05em"></span>
@@ -178,10 +184,11 @@
       <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph">⏭</span>TAPE</button>
       <button class="tbtn" id="btnEject" title="Eject"><span class="glyph">⏏</span>EJECT</button>
     </div>
+  </div>
 
-    <div class="tapebox">
-      <div class="list" id="trackList"></div>
-    </div>
+  <!-- Tracklist in its own chassis, outside the deck -->
+  <div class="tapebox">
+    <div class="list" id="trackList"></div>
   </div>
 
   <!-- Settings modal -->
@@ -216,6 +223,16 @@
       <p class="sub">Sign in to access the private mixes.<br/>Or continue with the public tapes only.</p>
       <button class="btn primary" id="btnDoLogin" style="width:100%">🔐 Sign in with Google</button>
       <button class="btn" id="btnPubOnly" style="width:100%; margin-top:8px">🌐 Continue without signing in (public only)</button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="overlay hidden" id="searchOverlay">
+    <div class="sheet">
+      <h3>🔍 Search</h3>
+      <input id="searchInput" placeholder="Type (part of) a track title — searches all tapes…" autocomplete="off" />
+      <div id="searchResults" style="margin-top:10px; max-height:50vh; overflow-y:auto"></div>
+      <button class="btn" id="btnCloseSearch" style="margin-top:10px">CLOSE</button>
     </div>
   </div>
 
@@ -256,7 +273,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.5";
+const APP_VERSION = "1.9";
 
 const state = {
   apiKey: "", clientId: "",
@@ -452,6 +469,25 @@ async function loadFolderList() {
   state.folders = all;
   updateBalloon();
 }
+async function getTapeFiles(folder) {
+  const key = folder.id + (folder.origin === "priv" ? "p" : "u");
+  if (state.tapeCache && state.tapeCache[key]) return state.tapeCache[key];
+  const mixed = (await listChildren(folder.id,
+    "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
+    folder.origin))
+    .sort((a, b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));  // newest edit first
+  // Multiple versions of the same song (name, + and +- suffixes): keep only the last-modified one
+  const seen = new Set();
+  const files = mixed.filter((f) => {
+    const k = f.name.replace(/\.[^.]+$/, "").split("+")[0].trim().toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  if (!state.tapeCache) state.tapeCache = {};
+  state.tapeCache[key] = files;
+  return files;
+}
 async function loadFolder(idx, startAt) {
   if (!state.folders.length) return;
   state.folderIdx = ((idx % state.folders.length) + state.folders.length) % state.folders.length;
@@ -462,18 +498,8 @@ async function loadFolder(idx, startAt) {
   $("btnNextList").disabled = state.folderIdx >= state.folders.length - 1 && state.folders.length > 1;
   $("btnPrevList").classList.toggle("hidden", state.folders.length <= 1);
   $("btnNextList").classList.toggle("hidden", state.folders.length <= 1);
-  const mixed = (await listChildren(folder.id,
-    "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
-    folder.origin))
-    .sort((a, b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));  // newest edit first
-  // Multiple versions of the same song (name, + and +- suffixes): keep only the last-modified one
-  const seen = new Set();
-  state.files = mixed.filter((f) => {
-    const key = f.name.replace(/\.[^.]+$/, "").split("+")[0].trim().toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const files = await getTapeFiles(folder);
+  state.files = files;
   renderTrackList();
   await loadComments(folder);
   if (state.files.length) {
@@ -832,6 +858,55 @@ function clearToken() {
 }
 
 /* ---------- Buttons & init ---------- */
+/* ---------- Search (all tapes) ---------- */
+let searchBusy = false;
+async function doSearch(q) {
+  const res = $("searchResults"); res.innerHTML = "";
+  q = (q || "").trim().toLowerCase();
+  if (!q) { res.innerHTML = '<div class="sub">Type at least one character…</div>'; return; }
+  if (!state.folders.length) { res.innerHTML = '<div class="sub">No tapes loaded.</div>'; return; }
+  if (searchBusy) return;
+  searchBusy = true;
+  res.innerHTML = '<div class="sub">Searching…</div>';
+  const hits = [];
+  for (let fi = 0; fi < state.folders.length; fi++) {
+    const folder = state.folders[fi];
+    let files;
+    try { files = await getTapeFiles(folder); } catch (e) { continue; }
+    files.forEach((f, ti) => {
+      if (cleanTitle(f.name).toLowerCase().includes(q)) hits.push({ fi, ti, f, folder });
+    });
+  }
+  searchBusy = false;
+  res.innerHTML = "";
+  if (!hits.length) { res.innerHTML = '<div class="sub">No tracks found on any tape.</div>'; return; }
+  hits.forEach(({ fi, ti, f, folder }) => {
+    const d = document.createElement("div");
+    d.className = "track" + (fi === state.folderIdx && ti === state.fileIdx ? " active" : "");
+    const span = document.createElement("span");
+    span.textContent = cleanTitle(f.name);
+    const len = document.createElement("span");
+    len.className = "len";
+    len.textContent = trackLen(f) ? trackLen(f) + " · " + cleanTitle(folder.name) : cleanTitle(folder.name);
+    d.appendChild(span); d.appendChild(len);
+    d.onclick = async () => {
+      $("searchOverlay").classList.add("hidden");
+      if (fi !== state.folderIdx) await loadFolder(fi, ti);
+      else await playTrack(ti);
+    };
+    res.appendChild(d);
+  });
+}
+$("btnSearch").addEventListener("click", () => {
+  $("searchOverlay").classList.remove("hidden");
+  $("searchInput").value = "";
+  doSearch("");
+  $("searchInput").focus();
+});
+$("searchInput").addEventListener("input", (e) => doSearch(e.target.value));
+$("btnCloseSearch").addEventListener("click", () => $("searchOverlay").classList.add("hidden"));
+$("searchOverlay").addEventListener("click", (e) => { if (e.target === $("searchOverlay")) $("searchOverlay").classList.add("hidden"); });
+
 $("btnSettings").addEventListener("click", () => {
   const ov = $("setupOverlay");
   if (ov.classList.contains("hidden")) openSetup();
