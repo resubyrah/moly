@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#22201c" />
+<title>Mono Lisa</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
+<link rel="manifest" href='data:application/manifest+json,{"name":"Moly","short_name":"Moly","display":"standalone","background_color":"%2322201c","theme_color":"%2322201c","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%2322201c%27/%3E%3Crect x=%276%27 y=%2714%27 width=%2752%27 height=%2736%27 rx=%275%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Crect x=%2714%27 y=%2748%27 width=%2736%27 height=%274%27 rx=%272%27 fill=%27%23241f15%27/%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}' />
+<style>
+  :root {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:#f5f5f7; color:#1d1d1f;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; min-height:100vh; padding:20px 16px 40px; max-width:520px; margin-inline:auto;
+         background:#f5f5f7; }
+
+  /* ---------- Chrome / deck (Apple-clean; the cassette itself stays retro) ---------- */
+  .deck { background:linear-gradient(180deg,#3a3a3e 0%,#2c2c30 60%,#242427 100%); border-radius:20px;
+          padding:16px 16px 18px;
+          box-shadow:0 4px 24px rgba(0,0,0,.18), 0 1px 2px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.14); }
+  .brandbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .brand { display:flex; align-items:center; gap:8px; }
+  .brand .name { font-size:.95rem; font-weight:600; color:#f5f5f7; letter-spacing:-.01em; }
+  .settingsbtn { background:none; border:none; color:#f5f5f7; border-radius:8px;
+                 padding:4px 8px; cursor:pointer; font:inherit; }
+  .settingsbtn:active { opacity:.5; }
+  .iconbtn { background:none; border:none; border-radius:10px; padding:8px 10px;
+             cursor:pointer; font:inherit; font-size:1.05rem; color:#1d1d1f; line-height:1.3; }
+  .iconbtn:disabled { opacity:.25; cursor:default; }
+  .iconbtn:active { opacity:.5; }
+  .menurow { display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+             background:none; border:none; border-radius:10px; padding:11px 12px;
+             cursor:pointer; font:inherit; font-size:.95rem; color:#1d1d1f; }
+  .menurow:hover { background:rgba(0,0,0,.05); }
+  .menurow .rlabel { flex:1; }
+  .menurow .rstate { font-size:.8rem; color:#86868b; }
+  #btnLogin, #btnMode, #btnRandom { filter:grayscale(1); opacity:.4; transition:filter .2s, opacity .2s; }
+  #btnLogin.active, #btnMode.active, #btnRandom.active { filter:none; opacity:1; }
+  #btnLogin:disabled, #btnMode:disabled, #btnRandom:disabled { filter:grayscale(1); opacity:.15; }
+  #searchResults .track { cursor:pointer; }
+  #searchResults .track.active { background:rgba(232,196,106,.18); color:#8a6a10; }
+  .tapetitle { text-align:center; font-size:1.15rem; font-weight:700; color:#f5f5f7;
+               text-transform:uppercase; letter-spacing:.06em;
+               font-family:"Caveat", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+               margin:2px 0 8px; overflow-wrap:anywhere; letter-spacing:-.01em; }
+
+  /* ---------- Cassette window ---------- */
+  .cassette { position:relative; overflow:hidden;
+              background:linear-gradient(180deg,#ff6a45 0%,#f4472b 55%,#d63a20 100%);
+              border-radius:12px; padding:10px 14px 10px; min-height:142px;
+              box-shadow:inset 0 2px 8px rgba(0,0,0,.45), inset 0 -2px 8px rgba(0,0,0,.35);
+              border:3px solid #b02e10; outline:1px solid #000; }
+  .cassette > * { position:relative; z-index:5; }
+  .reel { position:absolute; top:50%; left:25%; z-index:1;
+          transform:translate(-50%,-50%); width:190px; height:190px; border-radius:50%;
+          background:radial-gradient(circle,#ddd4c4 0%,#c4baa6 45%,#a2977f 100%);
+          border:7px solid #1a1a1d; box-shadow:0 2px 8px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.18); }
+  .reel.right { left:75%; }
+  .spin { animation:spin 3.2s linear infinite; }
+  @keyframes spin {
+    from { transform:translate(-50%,-50%) rotate(0deg); }
+    to   { transform:translate(-50%,-50%) rotate(360deg); }
+  }
+  .reel .pile { position:absolute; inset:0; margin:auto; width:var(--d,90px); height:var(--d,90px);
+                border-radius:50%; background:radial-gradient(circle at 35% 30%,#4a2f1c,#2a1a10 70%);
+                box-shadow:inset 0 0 4px rgba(0,0,0,.6); transition:width .4s, height .4s; }
+  .reel .hub { position:absolute; inset:0; margin:auto; width:36px; height:36px; border-radius:50%; z-index:4;
+               background:conic-gradient(#d8d8de,#9a9aa2,#e2e2e8,#8a8a92,#d8d8de);
+               border:3px solid #55555e; box-shadow:0 1px 3px #000; }
+  .tape-label { background:linear-gradient(180deg,#f4ecd7,#e2d6b8); color:#3a3020; border-radius:4px;
+                padding:5px 10px; text-align:center; font-size:.9rem; font-weight:700; letter-spacing:.04em;
+                overflow-wrap:anywhere; margin-bottom:4px; box-shadow:0 1px 0 rgba(255,255,255,.4) inset; }
+  .counter { position:relative; text-align:center; color:#fff3da; font-size:1.1rem; letter-spacing:.2em;
+             text-shadow:0 1px 3px rgba(0,0,0,.6); margin-bottom:2px; background:none; }
+  .counter .dur { color:#f0d9ac; letter-spacing:.05em; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+  .counter .iconbtn { color:#f6e7c8; }
+  .counter .iconbtn { position:absolute; right:0; top:50%; transform:translateY(-50%); letter-spacing:0;
+                      border:none; background:none; padding:2px; font-size:.75rem; }
+  .track { position:relative; }
+          background:radial-gradient(circle,#e5d9b8 0%,#c9b98a 40%,#8f7d52 100%);
+          border:6px solid #2a2318; box-shadow:0 2px 8px #000, inset 0 0 0 1px rgba(255,240,200,.25); }
+  input[type=range] { width:100%; accent-color:#e8c46a; }
+
+  /* ---------- VU meter ---------- */
+  .vu { display:flex; justify-content:center; gap:10px; margin-top:6px; }
+  .vuch { display:flex; gap:3px; align-items:flex-end; height:44px; padding:5px 7px;
+          background:rgba(13,11,8,.72); border:1px solid #000;
+          border-radius:6px; box-shadow:inset 0 2px 6px #000; }
+  .vuch span { width:5px; height:5px; border-radius:1px; background:#3a2f1a; transition:background .08s, height .08s; }
+  .vuch span.on { background:#e8c46a; }
+  .vuch span:nth-last-child(1).on, .vuch span:nth-last-child(2).on { background:#e06a2b; }
+  .vuch span:nth-last-child(1).on { background:#d94f3d; }
+  .vuch.rev { flex-direction:row-reverse; }   /* hot segments (nth-last-child) end up left */
+
+  /* ---------- Transport buttons (antraciet metallic, flush together) ---------- */
+  .transport { display:flex; justify-content:center; align-items:center; gap:6px; margin-top:14px; }
+  .tbtn { flex:none; font:inherit; font-size:.68rem; letter-spacing:.08em; color:#e8e8ec; cursor:pointer;
+          background:linear-gradient(180deg,#5a5a60 0%,#3f3f45 45%,#333338 55%,#4a4a50 100%);
+          border:1px solid #1a1a1d; padding:10px 13px 9px; min-width:64px;
+          text-align:center; user-select:none;
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.5); }
+  .tbtn:active { background:linear-gradient(180deg,#333338 0%,#26262b 100%); }
+  .tbtn .glyph { display:block; font-size:1.15rem; line-height:1.1; margin-bottom:2px; color:#f2c14e; }
+  .tbtn.primary { background:linear-gradient(180deg,#f2c14e 0%,#d9a432 50%,#b98a22 100%);
+                  border-color:#8a6410; color:#241a04; }
+  .tbtn.primary .glyph { color:#241a04; }
+  .tbtn:disabled { opacity:.3; cursor:default; }
+  .keyrow { display:flex; border-radius:8px; overflow:hidden; border:1px solid #1a1a1d;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.16); }
+  .keyrow .tbtn { border:none; border-right:1px solid #1a1a1d; border-radius:0; min-width:56px; }
+  .keyrow .tbtn:last-of-type { border-right:none; }
+
+  /* ---------- Analog VU meters (next to the transport row) ---------- */
+  .vumeter { background:linear-gradient(180deg,#1c1913,#0d0b08); border:2px solid #2a2318;
+             border-radius:8px; box-shadow:inset 0 2px 6px #000; display:block; flex:none; }
+
+  /* ---------- Playlist / tape select ---------- */
+  .tapebox { margin-top:16px; padding:12px 14px;
+             background:#ffffff; border-radius:20px;
+             box-shadow:0 4px 24px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04); }
+  .tapenav { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+  .tapenav .name { text-align:center; font-size:.85rem; color:#1d1d1f; letter-spacing:.06em;
+                   overflow-wrap:anywhere; flex:1; }
+  .smallbtn { font:inherit; font-size:.7rem; letter-spacing:.05em; background:rgba(0,0,0,.06); color:#1d1d1f;
+              border:none; border-radius:8px; padding:6px 10px; cursor:pointer; }
+  .smallbtn:active { background:rgba(0,0,0,.14); }
+  .list { max-height:34vh; overflow:auto; background:#f5f5f7; border:none;
+          border-radius:12px; padding:6px; }
+  .track { display:flex; justify-content:space-between; gap:10px; padding:9px 12px; border-radius:10px;
+           cursor:pointer; font-size:1rem; color:#1d1d1f; }
+  .track:hover { background:rgba(0,0,0,.05); }
+  .track.active { background:rgba(232,196,106,.22); color:#7a5c0e; font-weight:600; }
+  .track .len { color:#86868b; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .minislider { position:absolute; left:10px; right:10px; bottom:-3px; width:calc(100% - 20px);
+                height:12px; accent-color:#e8c46a; cursor:pointer; }
+  .hidden { display:none !important; }
+
+  /* ---------- Sheets / overlays ---------- */
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,.32); display:flex;
+             align-items:center; justify-content:center; padding:16px; z-index:10; }
+  .sheet { background:#ffffff; border-radius:18px; padding:18px;
+           width:100%; max-width:400px; max-height:80vh; overflow:auto;
+           box-shadow:0 20px 60px rgba(0,0,0,.25); }
+  .sheet h3 { margin:0 0 12px; color:#1d1d1f; letter-spacing:-.01em; font-size:1.15rem; }
+  .sub { color:#86868b; font-size:.85rem; margin-bottom:12px; }
+  input[type=text], input:not([type]) { width:100%; padding:11px 12px; border-radius:10px; margin-bottom:8px;
+          border:1px solid #d2d2d7; background:#f5f5f7; color:#1d1d1f; font:inherit; font-size:.95rem; }
+  input[type=text]:focus, input:not([type]):focus { outline:none; border-color:#1d1d1f; background:#ffffff; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  .btn { font:inherit; cursor:pointer; border:none; background:rgba(0,0,0,.06); color:#1d1d1f;
+         border-radius:12px; padding:11px 16px; font-size:.9rem; }
+  .btn.primary { background:#1d1d1f; color:#ffffff; font-weight:600; }
+  .btn:active { opacity:.6; }
+
+  .comment { padding:8px 10px; border-radius:10px; font-size:.9rem; color:#1d1d1f; }
+  .comment .ts { color:#c47b10; font-weight:700; margin-right:6px; font-variant-numeric:tabular-nums; }
+  .comment.hl { background:rgba(232,196,106,.2); outline:2px solid #e8c46a; }
+  .menudiv { border-top:1px solid #e8e8ed; margin:6px 0; }
+
+  .msg { font-size:.8rem; padding:10px 14px; border-radius:12px; margin-top:8px;
+         background:#ffffff; color:#1d1d1f; box-shadow:0 4px 24px rgba(0,0,0,.12); }
+  .msg.ok { color:#248a3d; }
+  .msg.err { color:#d70015; }
+  details summary { cursor:pointer; color:#1d1d1f; margin-bottom:8px; }
+  label { display:block; font-size:.75rem; color:#86868b; letter-spacing:.02em; margin-top:8px; }
+</style>
+</head>
+<body>
+  <div class="deck" id="deck">
+    <div class="brandbar">
+      <div class="brand">
+        <img alt="cassette" style="width:22px; height:22px; display:block" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
+        <span class="name" id="brandDate">mono lisa</span>
+      </div>
+      <button class="settingsbtn" id="btnMenu" title="Menu" style="font-size:1.4rem; padding:2px 10px">☰</button>
+    </div>
+
+    <div class="tapetitle" id="tapeName">—</div>
+
+    <div class="cassette">
+      <div class="reel" id="reelL"><div class="pile" id="pileL"></div><div class="hub"></div></div>
+      <div class="reel right" id="reelR"><div class="pile" id="pileR"></div><div class="hub"></div></div>
+      <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span> <button class="iconbtn" id="btnComment" title="Tap = add note at this moment · Hold = show notes">💬</button></div>
+    </div>
+
+    <div class="transport">
+      <canvas class="vumeter" id="vuL" width="84" height="58" title="VU left"></canvas>
+      <div class="keyrow">
+        <button class="tbtn" id="btnPrevList" title="Previous tape"><span class="glyph">⏮</span>TAPE</button>
+        <button class="tbtn primary" id="btnPlayPause"><span class="glyph" id="ppGlyph">⏸</span><span id="ppTxt">PAUSE</span></button>
+        <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph">⏭</span>TAPE</button>
+        <button class="tbtn" id="btnEject" title="Eject"><span class="glyph">⏏</span>EJECT</button>
+      </div>
+      <canvas class="vumeter" id="vuR" width="84" height="58" title="VU right"></canvas>
+    </div>
+  </div>
+
+  <!-- Zen menu -->
+  <div class="overlay hidden" id="menuOverlay">
+    <div class="sheet" style="max-width:320px">
+      <h3>mono lisa</h3>
+      <button class="menurow" id="btnLogin"><span>🔑</span><span class="rlabel">Sign in / private tapes</span><span class="rstate" id="stLogin"></span></button>
+      <button class="menurow" id="btnMode"><span>🌐</span><span class="rlabel">Public tapes</span><span class="rstate" id="stMode"></span></button>
+      <button class="menurow" id="btnRandom"><span>🎲</span><span class="rlabel">Shuffle</span><span class="rstate" id="stRandom"></span></button>
+      <div class="menudiv"></div>
+      <button class="menurow" id="btnSearch"><span>🔍</span><span class="rlabel">Search</span></button>
+      <button class="menurow" id="btnSettings"><span>⚙️</span><span class="rlabel">Setup</span></button>
+      <div class="menudiv"></div>
+      <div class="sub" style="text-align:center; margin:4px 0 0" id="versionTag"></div>
+    </div>
+  </div>
+
+  <!-- Tracklist in its own chassis, outside the deck -->
+  <div class="tapebox">
+    <div class="list" id="trackList"></div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="overlay hidden" id="setupOverlay">
+    <div class="sheet">
+      <h3>Setup</h3>
+      <details id="setupDetails" open>
+        <summary style="margin-bottom:6px">Folders &amp; keys</summary>
+        <label>Private folder (sign-in required; share with specific people)</label>
+        <input id="folderUrl" placeholder="https://drive.google.com/drive/folders/... (Mixes)" />
+        <label>Public folder (anyone with the link — Reader, no sign-in)</label>
+        <input id="publicFolderUrl" placeholder="https://drive.google.com/drive/folders/... (MixesPub) — may be empty" />
+        <label>Google API key (for the public folder)</label>
+        <input id="apiKey" placeholder="AIza..." />
+        <label>OAuth Client ID (for sign-in, private folder and notes)</label>
+        <input id="clientId" placeholder="xxxxx.apps.googleusercontent.com" />
+        <div class="row">
+          <button class="btn primary" id="btnStart">LOAD &amp; PLAY</button>
+          <button class="btn" id="btnCloseSetup">CLOSE</button>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Error / status bar (independent of setup) -->
+  <div id="errorBar" class="msg err hidden" style="position:fixed; left:16px; right:16px; bottom:14px; z-index:20; max-width:488px; margin-inline:auto"></div>
+
+  <!-- Sign-in -->
+  <div class="overlay hidden" id="loginOverlay">
+    <div class="sheet" style="text-align:center">
+      <h3>Welcome to <span id="loginTenant">Moly</span></h3>
+      <p class="sub">Sign in to access the private mixes.<br/>Or continue with the public tapes only.</p>
+      <button class="btn primary" id="btnDoLogin" style="width:100%">🔐 Sign in with Google</button>
+      <button class="btn" id="btnPubOnly" style="width:100%; margin-top:8px">🌐 Continue without signing in (public only)</button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="overlay hidden" id="searchOverlay">
+    <div class="sheet">
+      <h3>🔍 Search</h3>
+      <input id="searchInput" placeholder="Type (part of) a track title — searches all tapes…" autocomplete="off" />
+      <div id="searchResults" style="margin-top:10px; max-height:50vh; overflow-y:auto"></div>
+      <button class="btn" id="btnCloseSearch" style="margin-top:10px">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- Note input -->
+  <div class="overlay hidden" id="inputOverlay">
+    <div class="sheet">
+      <h3>Note</h3>
+      <div class="sub" id="inputAt">at 0:00</div>
+      <input id="commentText" placeholder="Your note at this moment..." />
+      <div class="row">
+        <button class="btn primary" id="btnSaveComment">SAVE</button>
+        <button class="btn" id="btnCancelComment">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes overview -->
+  <div class="overlay hidden" id="listOverlay">
+    <div class="sheet">
+      <h3>Notes <span class="sub" id="listCount"></span></h3>
+      <div id="commentList"></div>
+      <button class="btn" id="btnCloseList" style="margin-top:10px">CLOSE</button>
+    </div>
+  </div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CONFIG = {
+  tenant:           "Mono Lisa",
+  folderUrl:        "https://drive.google.com/drive/folders/1ZRtriefc0mwkHHtKxWTmTrQnQs3DHPq0",
+  publicFolderUrl:  "https://drive.google.com/drive/folders/1nxTjGqAdec-XN1sBe4S6AfpPYQUSGXCF",
+  apiKey:           "AIzaSyCtyBR39w4_5-gVkl7ytSyZ2Hf1fHEOYb0",
+  clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
+};
+
+const APP_VERSION = "1.19";
+
+const state = {
+  apiKey: "", clientId: "",
+  privRoot: null, pubRoot: null,
+  mode: "public",                     // "public" = only public tapes, "mixed" = private + public
+  shuffle: false,
+  folders: [], folderIdx: -1,        // each folder: {id, name, origin: "priv"|"pub"}
+  files: [], fileIdx: -1,
+  comments: [], commentsFileId: null,
+  token: null,
+};
+const audio = new Audio();
+audio.preload = "auto";
+
+/* ---------- Setup / storage ---------- */
+for (const [k, id, cfg] of [
+  ["mlFolder","folderUrl","folderUrl"],
+  ["mlPubFolder","publicFolderUrl","publicFolderUrl"],
+  ["mlKey","apiKey","apiKey"],
+  ["mlClient","clientId","clientId"],
+]) {
+  const cfgVal = CONFIG[cfg] && !CONFIG[cfg].startsWith("HIER-JOUW-") ? CONFIG[cfg] : "";
+  const v = localStorage.getItem(k) || cfgVal; if (v) $(id).value = v;
+}
+$("btnStart").addEventListener("click", () => { saveSetup(); begin(); });
+$("btnRandom").addEventListener("click", async () => {
+  state.shuffle = !state.shuffle;                     // toggle, default off
+  updateBalloon();
+  if (state.shuffle && state.folders.length) {
+    const idx = Math.floor(Math.random() * state.folders.length);
+    await loadFolder(idx, "shuffle");
+  }
+});
+$("btnLogin").addEventListener("click", async () => {
+  try {
+    if (!state.token) {
+      state.token = await getToken();
+      saveToken(state.token);
+    }
+    state.mode = "mixed";   // key = private mode
+    await refreshTapes();
+  } catch (e) { msg("Sign-in failed: " + e.message, false); }
+});
+$("btnMode").addEventListener("click", async () => {
+  if (!state.token) return;
+  state.mode = state.mode === "public" ? "mixed" : "public";  // globe toggles public/private
+  await refreshTapes();
+});
+async function refreshTapes() {
+  const oldIdx = state.folderIdx;
+  await loadFolderList();
+  await loadFolder(oldIdx >= 0 && oldIdx < state.folders.length ? oldIdx : 0);
+  updateBalloon();
+}
+
+function saveSetup() {
+  localStorage.setItem("mlFolder", $("folderUrl").value);
+  localStorage.setItem("mlPubFolder", $("publicFolderUrl").value);
+  localStorage.setItem("mlKey", $("apiKey").value);
+  localStorage.setItem("mlClient", $("clientId").value);
+}
+function msg(text, ok) {
+  const m = $("errorBar");
+  m.textContent = text;
+  m.className = "msg " + (ok ? "ok" : "err");
+  clearTimeout(msg._t);
+  msg._t = setTimeout(() => m.classList.add("hidden"), ok ? 4000 : 12000);  // auto-hide
+}
+window.addEventListener("error", (e) => { try { msg("Error: " + e.message, false); } catch (_) {} });
+window.addEventListener("unhandledrejection", (e) => { try { msg("Error: " + (e.reason && e.reason.message || e.reason), false); } catch (_) {} });
+
+/* ---------- Title cleaning ---------- */
+function cleanTitle(name) {
+  let t = name.replace(/\.[^.]+$/, "");                     // drop extension
+  t = t.replace(/^(kopie van|copy of)\s*/i, "");            // drop copy prefix
+  t = t.split("+")[0];                                     // hide suffix starting with '+'
+  t = t.trim().replace(/[\s_-]+$/, "");                     // trailing junk
+  t = t.replace(/[-_]+/g, " ");                             // dashes/underscores as spaces
+  t = t.replace(/\s+/g, " ").trim();
+  if (t) t = t[0].toUpperCase() + t.slice(1);               // first letter uppercase
+  return t || "no name";                                    // unnamed file (e.g. ".mp3")
+}
+function fmtTime(s) {
+  s = Math.max(0, Math.floor(s));
+  const m = Math.floor(s / 60);
+  return (m >= 60 ? Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0") : m) + ":" + String(s % 60).padStart(2, "0");
+}
+function trackLen(file) {
+  const d = localStorage.getItem("mlDur_" + file.id);
+  return d ? fmtTime(parseInt(d, 10)) : "";
+}
+function rememberLen(file) {
+  if (isFinite(audio.duration) && audio.duration > 0)
+    localStorage.setItem("mlDur_" + file.id, String(Math.round(audio.duration)));
+}
+
+/* ---------- Drive helpers ---------- */
+function parseFolderId(s) {
+  s = (s || "").trim();
+  if (!s) return null;
+  const m = s.match(/folders\/([a-zA-Z0-9_-]+)/) || s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : (/^[a-zA-Z0-9_-]{20,}$/.test(s) ? s : null);
+}
+async function driveGet(path, origin) {
+  const headers = {};
+  let url = "https://www.googleapis.com/drive/v3/" + path;
+  if (origin === "priv") {
+    if (!state.token) throw new Error("Not signed in");
+    headers["Authorization"] = "Bearer " + state.token;
+  } else {
+    if (!state.apiKey) throw new Error("No API key configured");
+    url += (path.includes("?") ? "&" : "?") + "key=" + state.apiKey;
+  }
+  const r = await fetch(url, { headers });
+  if (r.status === 401 && state.token) {
+    clearToken();
+    throw new Error("Session expired — please sign in again.");
+  }
+  if (!r.ok) throw new Error("Drive error " + r.status + ": " + (await r.text()).slice(0, 200));
+  return r.json();
+}
+async function listChildren(folderId, q, origin, orderBy) {
+  const params = "q=" + encodeURIComponent(q.replace("PARENT", folderId)) +
+    "&fields=files(id,name,modifiedTime,mimeType)&pageSize=200" +
+    (orderBy ? "&orderBy=" + encodeURIComponent(orderBy) : "");
+  const res = await driveGet("files?" + params, origin);
+  return res.files || [];
+}
+
+/* ---------- Startup / tape loading ---------- */
+function readConfigInputs() {
+  state.apiKey = $("apiKey").value.trim();
+  state.clientId = $("clientId").value.trim();
+  state.privRoot = parseFolderId($("folderUrl").value);
+  state.pubRoot = parseFolderId($("publicFolderUrl").value);
+}
+function updateBalloon() {
+  $("btnComment").classList.toggle("hidden", !state.token);
+  const pub = !state.token || state.mode === "public";
+  const m = $("btnMode"), k = $("btnLogin");
+  m.classList.toggle("active", pub);              // globe on = public tapes
+  m.disabled = !state.token;                     // no sign-in → public is all there is
+  k.classList.toggle("active", !!state.token && !pub);  // key on = private mode (inverse of globe)
+  $("btnRandom").classList.toggle("active", state.shuffle);
+  m.title = pub ? "Public mode — public tapes" : "Private mode";
+  k.title = state.token ? "Private mode" : "Sign in with Google for private tapes";
+  // Zen menu state labels
+  $("stLogin").textContent = state.token ? (pub ? "signed in" : "private") : "sign in";
+  $("stMode").textContent = pub ? "public" : "private";
+  $("stRandom").textContent = state.shuffle ? "on" : "off";
+}
+document.querySelectorAll(".menurow").forEach((b) =>
+  b.addEventListener("click", () => $("menuOverlay").classList.add("hidden")));
+async function begin() {
+  readConfigInputs();
+  if (!state.privRoot && !state.pubRoot) { openSetup(); msg("Enter at least one folder URL.", false); return; }
+  if (state.pubRoot && !state.apiKey) { openSetup(); msg("The public folder needs an API key.", false); return; }
+  if (state.privRoot && !state.token && !state.clientId) { openSetup(); msg("The private folder needs a Client ID.", false); return; }
+  $("loginOverlay").classList.add("hidden");
+  try {
+    await loadFolderList();
+    if (!state.folders.length) throw new Error("No playable folders found (is the folder shared / does it contain audio?).");
+    // Signed in → start with the newest private tape ('Mixes YYMMDD'); otherwise the first public one
+    let startIdx = 0;
+    if (state.token) {
+      const i = state.folders.findIndex((f) => f.origin === "priv");
+      if (i >= 0) startIdx = i;
+    }
+    await loadFolder(startIdx);
+  } catch (e) { msg(e.message, false); }
+  updateBalloon();
+}
+function autoStart() {
+  readConfigInputs();
+  const tok = getSavedToken();
+  if (tok) { state.token = tok; state.mode = "mixed"; begin(); return; }
+  if (state.privRoot && state.clientId) { $("loginOverlay").classList.remove("hidden"); return; }
+  begin();
+}
+async function loadFolderList() {
+  const all = [];
+  if (state.pubRoot) {
+    let pubs = await listChildren(state.pubRoot,
+      "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+      "pub", "modifiedTime desc");
+    if (!pubs.length) pubs = [{ id: state.pubRoot, name: "Public", modifiedTime: new Date().toISOString() }];
+    pubs.forEach((f) => all.push({ ...f, origin: "pub" }));
+  }
+  if (state.privRoot && state.token && state.mode !== "public") {
+    let privs = await listChildren(state.privRoot,
+      "'PARENT' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+      "priv", "modifiedTime desc");
+    if (!privs.length) privs = [{ id: state.privRoot, name: "Mixes", modifiedTime: new Date().toISOString() }];
+    // Sort by date in the name ('Mixes YYYYMMDD', suffixes ignored) — newest first
+    const dateKey = (n) => { const m = (n || "").match(/(\d{8})/); return m ? m[1] : ""; };
+    privs.sort((a, b) => dateKey(b.name).localeCompare(dateKey(a.name)) || (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));
+    privs.forEach((f) => all.push({ ...f, origin: "priv" }));
+  }
+  state.folders = all;
+  updateBalloon();
+}
+async function getTapeFiles(folder) {
+  const key = folder.id + (folder.origin === "priv" ? "p" : "u");
+  if (state.tapeCache && state.tapeCache[key]) return state.tapeCache[key];
+  const mixed = (await listChildren(folder.id,
+    "'PARENT' in parents and mimeType contains 'audio' and trashed=false",
+    folder.origin))
+    .sort((a, b) => (b.modifiedTime || "").localeCompare(a.modifiedTime || ""));  // newest edit first
+  // Multiple versions of the same song (name, + and +- suffixes): keep only the last-modified one
+  const seen = new Set();
+  const files = mixed.filter((f) => {
+    const k = f.name.replace(/\.[^.]+$/, "").split("+")[0].trim().toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  if (!state.tapeCache) state.tapeCache = {};
+  state.tapeCache[key] = files;
+  return files;
+}
+async function loadFolder(idx, startAt) {
+  if (!state.folders.length) return;
+  state.folderIdx = ((idx % state.folders.length) + state.folders.length) % state.folders.length;
+  const folder = state.folders[state.folderIdx];
+  $("brandDate").textContent = "mono lisa";   // brand name, always
+  $("tapeName").textContent = cleanTitle(folder.name);    // sticker 1: folder/tape name
+  // Hide at the boundaries (no dimmed buttons)
+  $("btnPrevList").classList.toggle("hidden", state.folders.length <= 1 || state.folderIdx <= 0);
+  $("btnNextList").classList.toggle("hidden", state.folders.length <= 1 || state.folderIdx >= state.folders.length - 1);
+  const files = await getTapeFiles(folder);
+  state.files = files;
+  renderTrackList();
+  await loadComments(folder);
+  if (state.files.length) {
+    let start = 0;
+    if (startAt === "shuffle") start = Math.floor(Math.random() * state.files.length);
+    else if (Number.isInteger(startAt) && startAt >= 0 && startAt < state.files.length) start = startAt;
+    await playTrack(start);
+  }
+}
+function renderTrackList() {
+  const el = $("trackList"); el.innerHTML = "";
+  state.files.forEach((f, i) => {
+    const d = document.createElement("div");
+    d.className = "track" + (i === state.fileIdx ? " active" : "");
+    const span = document.createElement("span");
+    span.textContent = cleanTitle(f.name);
+    const len = document.createElement("span");
+    len.className = "len"; len.textContent = trackLen(f);
+    d.appendChild(span); d.appendChild(len);
+    if (i !== state.fileIdx) {
+      d.onclick = () => playTrack(i);
+    } else {
+      /* Active track: tap (or hover on desktop) reveals the seek slider at the bottom edge */
+      const s = document.createElement("input");
+      s.type = "range"; s.id = "miniSeek"; s.min = 0; s.max = 100; s.value = 0;
+      s.className = "minislider hidden";
+      s.addEventListener("input", () => {
+        if (isFinite(audio.duration)) audio.currentTime = (s.value / 100) * audio.duration;
+      });
+      s.addEventListener("click", (e) => e.stopPropagation());
+      d.appendChild(s);
+      d.onclick = () => s.classList.toggle("hidden");              // mobile: tap the title
+      d.addEventListener("mouseenter", () => s.classList.remove("hidden"));
+      d.addEventListener("mouseleave", () => s.classList.add("hidden"));
+    }
+    el.appendChild(d);
+  });
+}
+
+/* ---------- Audio ---------- */
+async function playTrack(i) {
+  const f = state.files[i]; if (!f) return;
+  const folder = state.folders[state.folderIdx];
+  state.fileIdx = i; renderTrackList();
+  updateTapePiles();
+  $("trackDurWrap").textContent = trackLen(f) ? "/ " + trackLen(f) : "";
+  try {
+    const url = await fetchAudioUrl(f.id, folder.origin);
+    audio.src = url;
+    await audio.play();
+    setPlaying(true);
+    updateMediaSession();
+  } catch (e) {
+    setPlaying(false);
+    msg("Cannot load track (" + (e.message || e) + ").", false);
+  }
+}
+async function fetchAudioUrl(fileId, origin) {
+  const headers = {};
+  let url = "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media";
+  if (origin === "priv") {
+    if (!state.token) throw new Error("not signed in");
+    headers["Authorization"] = "Bearer " + state.token;
+  } else {
+    url += "&key=" + state.apiKey;
+  }
+  const r = await fetch(url, { headers });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  const blob = await r.blob();
+  if (blob.size < 1024) throw new Error("file too small / no access");
+  return URL.createObjectURL(blob);
+}
+function setPlaying(p) {
+  $("ppGlyph").textContent = p ? "⏸" : "▶";
+  $("ppTxt").textContent = p ? "PAUSE" : "PLAY";
+  document.querySelectorAll(".reel").forEach((r) => r.classList.toggle("spin", p));
+}
+audio.addEventListener("ended", () => {
+  if (state.shuffle && state.files.length) {                 // shuffle mode: random next track
+    playTrack(Math.floor(Math.random() * state.files.length));
+  } else if (state.fileIdx < state.files.length - 1) playTrack(state.fileIdx + 1);
+  else if (state.folderIdx < state.folders.length - 1) loadFolder(state.folderIdx + 1);
+});
+audio.addEventListener("loadedmetadata", () => {
+  if (isFinite(audio.duration)) {
+    $("trackDurWrap").textContent = "/ " + fmtTime(audio.duration);
+    rememberLen(state.files[state.fileIdx]);
+    renderTrackList();
+  }
+});
+/* ---------- Tape progress: pile moves from left reel to right reel ---------- */
+function tapeProgress() {
+  const n = state.files.length;
+  if (!n) return 0;
+  const cur = isFinite(audio.duration) && audio.duration > 0 ? audio.currentTime / audio.duration : 0;
+  return Math.min(1, (Math.max(0, state.fileIdx) + cur) / n);
+}
+function updateTapePiles() {
+  const p = tapeProgress();
+  // Left reel starts full and empties; right reel fills. Big reels → big piles, clearly visible.
+  $("pileL").style.setProperty("--d", (56 + (1 - p) * 96) + "px");  // supply reel empties
+  $("pileR").style.setProperty("--d", (56 + p * 96) + "px");        // take-up reel fills
+}
+audio.addEventListener("timeupdate", () => {
+  $("trackPos").textContent = fmtTime(audio.currentTime);
+  const ms = $("miniSeek");
+  if (ms && isFinite(audio.duration)) ms.value = (audio.currentTime / audio.duration) * 100;
+  updateTapePiles();
+});
+$("miniSeek") && $("miniSeek").addEventListener("input", (e) => {
+  if (isFinite(audio.duration)) audio.currentTime = (e.target.value / 100) * audio.duration;
+});
+
+/* ---------- Media Session: keep playing with screen off / other apps ---------- */
+function updateMediaSession() {
+  if (!("mediaSession" in navigator)) return;
+  const f = state.files[state.fileIdx];
+  if (!f) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: cleanTitle(f.name),
+    artist: cleanTitle(state.folders[state.folderIdx] ? state.folders[state.folderIdx].name : ""),
+    album: CONFIG.tenant || "Moly",
+  });
+  navigator.mediaSession.setActionHandler("play", () => { audio.play(); setPlaying(true); });
+  navigator.mediaSession.setActionHandler("pause", () => { audio.pause(); setPlaying(false); });
+  navigator.mediaSession.setActionHandler("previoustrack", () => {
+    (state.fileIdx > 0) ? playTrack(state.fileIdx - 1) : stepTape(-1);
+  });
+  navigator.mediaSession.setActionHandler("nexttrack", () => {
+    (state.fileIdx < state.files.length - 1) ? playTrack(state.fileIdx + 1) : stepTape(1);
+  });
+  try { navigator.mediaSession.setActionHandler("seekto", (d) => { if (d.seekTime != null) audio.currentTime = d.seekTime; }); } catch (e) {}
+}
+$("btnPlayPause").addEventListener("click", () => {
+  if (!audio.src) return;
+  if (audio.paused) { audio.play(); setPlaying(true); }
+  else { audio.pause(); setPlaying(false); }
+});
+$("btnEject").addEventListener("click", () => {
+  audio.pause(); setPlaying(false);
+  audio.currentTime = 0;
+  msg("⏏ Bye", true);
+});
+$("btnPrevList").addEventListener("click", () => stepTape(-1));
+$("btnNextList").addEventListener("click", () => stepTape(1));
+async function stepTape(dir) {
+  // Meerdere tapes: wissel van tape. Eén tape: gebruik als vorige/volgende nummer.
+  if (state.folders.length > 1) return loadFolder(state.folderIdx + dir);
+  if (state.files.length < 2) return;
+  const next = state.fileIdx + dir;
+  if (next >= 0 && next < state.files.length) await playTrack(next);
+}
+
+/* ---------- VU meter (true stereo: splitter + 2 analysers) ---------- */
+let vuRaf = null;
+function startVU() {
+  if (vuRaf) return;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  // Analog needle meters; draw static scales even without WebAudio (e.g. iOS)
+  const meters = [ { cv: $("vuL"), pos: 0 }, { cv: $("vuR"), pos: 0 } ];
+  const drawScale = (cv) => {
+    const c = cv.getContext("2d"), W = cv.width, H = cv.height;
+    c.fillStyle = "#c46a2b"; c.font = "7px sans-serif"; c.textAlign = "center";
+    c.fillText("VU", W / 2, 10);
+    c.strokeStyle = "#8a7c60"; c.lineWidth = 1;
+    c.beginPath(); c.arc(W / 2, H + 26, H + 8, -Math.PI * 0.72, -Math.PI * 0.28); c.stroke();
+    c.strokeStyle = "#d94f3d";
+    c.beginPath(); c.arc(W / 2, H + 26, H + 8, -Math.PI * 0.38, -Math.PI * 0.28); c.stroke();
+  };
+  meters.forEach((m) => drawScale(m.cv));
+  const drawNeedle = (m, target) => {
+    // VU ballistics: fast attack, slow release
+    m.pos += (target - m.pos) * (target > m.pos ? 0.25 : 0.06);
+    const cv = m.cv, c = cv.getContext("2d"), W = cv.width, H = cv.height;
+    drawScale(cv);
+    const ang = -Math.PI * 0.72 + m.pos * Math.PI * 0.44;  // -129.6° → -50.4°
+    c.strokeStyle = "#e8e2d4"; c.lineWidth = 2; c.lineCap = "round";
+    c.beginPath();
+    c.moveTo(W / 2, H + 26);
+    c.lineTo(W / 2 + Math.cos(ang) * (H + 6), H + 26 + Math.sin(ang) * (H + 6));
+    c.stroke();
+    c.fillStyle = "#e8e2d4";
+    c.beginPath(); c.arc(W / 2, H + 26, 2.5, 0, Math.PI * 2); c.fill();
+  };
+  if (isIOS) return;  // iOS suspends WebAudio in background; needles stay static
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    if (ctx.state === "suspended") ctx.resume();
+    const src = ctx.createMediaElementSource(audio);
+    const splitter = ctx.createChannelSplitter(2);
+    const anL = ctx.createAnalyser(), anR = ctx.createAnalyser();
+    anL.fftSize = 256; anR.fftSize = 256;
+    src.connect(splitter);
+    splitter.connect(anL, 0);   // left channel
+    splitter.connect(anR, 1);  // right channel
+    anL.connect(ctx.destination, 0);
+    anR.connect(ctx.destination, 0);
+    const dL = new Uint8Array(anL.frequencyBinCount);
+    const dR = new Uint8Array(anR.frequencyBinCount);
+    const level = (analyser, data) => {
+      analyser.getByteFrequencyData(data);
+      let s = 0; for (let i = 0; i < data.length; i++) s += data[i];
+      return Math.min(1, (s / data.length / 255) * 1.6);
+    };
+    const draw = () => {
+      drawNeedle(meters[0], audio.paused ? 0 : level(anL, dL));
+      drawNeedle(meters[1], audio.paused ? 0 : level(anR, dR));
+      vuRaf = requestAnimationFrame(draw);
+    };
+    vuRaf = requestAnimationFrame(draw);
+  } catch (e) { /* VU meter optional */ }
+}
+audio.addEventListener("play", startVU);
+
+/* ---------- Notes ---------- */
+const MD_NAME = "opmerkingen.md";
+async function loadComments(folder) {
+  state.comments = []; state.commentsFileId = null;
+  try {
+    const files = await listChildren(folder.id, "'PARENT' in parents and name='" + MD_NAME + "'", folder.origin);
+    if (files.length) {
+      state.commentsFileId = files[0].id;
+      const txt = await fetchFileText(files[0].id, folder.origin);
+      state.comments = parseComments(txt);
+    }
+  } catch (e) { /* no notes file yet */ }
+  const local = localStorage.getItem("mlComments_" + folder.id);
+  if (local && !state.commentsFileId) state.comments = parseComments(local);
+  renderComments(null);
+}
+async function fetchFileText(fileId, origin) {
+  const headers = {};
+  let url = "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media";
+  if (origin === "priv") { headers["Authorization"] = "Bearer " + state.token; }
+  else { url += "&key=" + state.apiKey; }
+  return (await fetch(url, { headers })).text();
+}
+function parseComments(md) {
+  const out = [];
+  for (const line of md.split(/\r?\n/)) {
+    const m = line.match(/^\s*[-*]\s*\[(\d+):(\d+)\]\s*(.*)$/);
+    if (m) out.push({ sec: parseInt(m[1]) * 60 + parseInt(m[2]), text: m[3].trim() });
+  }
+  return out.sort((a, b) => a.sec - b.sec);
+}
+function commentsAsMd() {
+  return state.comments.map((c) => "- [" + fmtTime(c.sec) + "] " + c.text).join("\n") + "\n";
+}
+function renderComments(currentSec) {
+  const wrap = $("commentList"); wrap.innerHTML = "";
+  $("listCount").textContent = "(" + state.comments.length + ")";
+  let hlIdx = -1;
+  if (currentSec != null) state.comments.forEach((c, i) => { if (c.sec <= currentSec) hlIdx = i; });
+  state.comments.forEach((c, i) => {
+    const d = document.createElement("div");
+    d.className = "comment" + (i === hlIdx ? " hl" : "");
+    d.innerHTML = "<span class='ts'>[" + fmtTime(c.sec) + "]</span>" + c.text.replace(/[<>&]/g, (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[ch]));
+    wrap.appendChild(d);
+  });
+  if (!state.comments.length) wrap.innerHTML = "<div class='sub'>No notes in this tape yet.</div>";
+}
+let holdTimer = null, held = false;
+const balloon = $("btnComment");
+balloon.addEventListener("pointerdown", () => {
+  held = false;
+  holdTimer = setTimeout(() => { held = true; openCommentList(); }, 450);
+});
+["pointerup", "pointerleave"].forEach((ev) => balloon.addEventListener(ev, () => clearTimeout(holdTimer)));
+balloon.addEventListener("click", () => { if (!held) openCommentInput(); });
+function openCommentInput() {
+  if (!audio.src) return;
+  $("inputAt").textContent = "at " + fmtTime(audio.currentTime) + " in " +
+    (state.files[state.fileIdx] ? cleanTitle(state.files[state.fileIdx].name) : "");
+  $("commentText").value = "";
+  $("inputOverlay").classList.remove("hidden");
+  setTimeout(() => $("commentText").focus(), 50);
+}
+function openCommentList() {
+  renderComments(audio.currentTime || null);
+  $("listOverlay").classList.remove("hidden");
+}
+$("btnCancelComment").addEventListener("click", () => $("inputOverlay").classList.add("hidden"));
+$("btnCloseList").addEventListener("click", () => $("listOverlay").classList.add("hidden"));
+[$("inputOverlay"), $("listOverlay")].forEach((ov) => ov.addEventListener("click", (e) => { if (e.target === ov) ov.classList.add("hidden"); }));
+$("btnSaveComment").addEventListener("click", saveComment);
+$("commentText").addEventListener("keydown", (e) => { if (e.key === "Enter") saveComment(); });
+async function saveComment() {
+  const text = $("commentText").value.trim();
+  if (!text) return $("inputOverlay").classList.add("hidden");
+  const folder = state.folders[state.folderIdx];
+  state.comments.push({ sec: Math.floor(audio.currentTime), text });
+  state.comments.sort((a, b) => a.sec - b.sec);
+  $("inputOverlay").classList.add("hidden");
+  renderComments(audio.currentTime);
+  if (!state.token) {
+    alert("To save notes to Drive you need to sign in first (LOG IN button).\nThe note is kept on this device only for now.");
+  }
+  await persistComments(folder);
+}
+async function persistComments(folder) {
+  const md = commentsAsMd();
+  if (!state.token) return localStorage.setItem("mlComments_" + folder.id, md);
+  try {
+    if (!state.commentsFileId) {
+      const meta = await (await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + state.token },
+        body: makeMultipart(md, folder.id),
+      })).json();
+      if (!meta.id) throw new Error("create failed");
+      state.commentsFileId = meta.id;
+    } else {
+      await fetch("https://www.googleapis.com/upload/drive/v3/files/" + state.commentsFileId + "?uploadType=media", {
+        method: "PATCH",
+        headers: { Authorization: "Bearer " + state.token, "Content-Type": "text/markdown" },
+        body: md,
+      });
+    }
+    localStorage.removeItem("mlComments_" + folder.id);
+  } catch (e) {
+    alert("Saving to Drive failed (" + (e.message || e) + "). The note is kept locally.");
+    localStorage.setItem("mlComments_" + folder.id, md);
+  }
+}
+function makeMultipart(md, folderId) {
+  const boundary = "ml" + Date.now();
+  const head = "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" +
+    JSON.stringify({ name: MD_NAME, mimeType: "text/markdown", parents: [folderId] }) +
+    "\r\n--" + boundary + "\r\nContent-Type: text/markdown\r\n\r\n";
+  return new Blob([head + md + "\r\n--" + boundary + "--"]);
+}
+
+/* ---------- Google Identity Services OAuth ---------- */
+let gisPromise = null;
+function getToken() {
+  return new Promise((resolve, reject) => {
+    const use = () => {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: state.clientId,
+        scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file",
+        callback: (r) => r.access_token ? resolve(r.access_token) : reject(new Error("no token received")),
+      });
+      client.requestAccessToken({ prompt: "" }); // silent reuse of earlier consent when possible
+    };
+    if (window.google && window.google.accounts && window.google.accounts.oauth2) return use();
+    if (!gisPromise) {
+      gisPromise = new Promise((res, rej) => {
+        const s = document.createElement("script");
+        s.src = "https://accounts.google.com/gsi/client";
+        s.onload = res; s.onerror = () => rej(new Error("Google sign-in script failed to load"));
+        document.head.appendChild(s);
+      });
+    }
+    gisPromise.then(use).catch(reject);
+  });
+}
+
+/* ---------- Token session cache ---------- */
+function saveToken(t) {
+  try { sessionStorage.setItem("mlToken", t); sessionStorage.setItem("mlTokenTs", String(Date.now())); } catch (e) {}
+}
+function getSavedToken() {
+  try {
+    const t = sessionStorage.getItem("mlToken");
+    const ts = parseInt(sessionStorage.getItem("mlTokenTs") || "0", 10);
+    if (t && Date.now() - ts < 50 * 60 * 1000) return t;
+    sessionStorage.removeItem("mlToken"); sessionStorage.removeItem("mlTokenTs");
+  } catch (e) {}
+  return null;
+}
+function clearToken() {
+  state.token = null;
+  try { sessionStorage.removeItem("mlToken"); sessionStorage.removeItem("mlTokenTs"); } catch (e) {}
+}
+
+/* ---------- Buttons & init ---------- */
+/* ---------- Zen menu ---------- */
+$("btnMenu").addEventListener("click", () => $("menuOverlay").classList.remove("hidden"));
+$("menuOverlay").addEventListener("click", (e) => { if (e.target === $("menuOverlay")) $("menuOverlay").classList.add("hidden"); });
+
+/* ---------- Search (all tapes) ---------- */
+let searchBusy = false;
+async function doSearch(q) {
+  const res = $("searchResults"); res.innerHTML = "";
+  q = (q || "").trim().toLowerCase();
+  if (!q) { res.innerHTML = '<div class="sub">Type at least one character…</div>'; return; }
+  if (!state.folders.length) { res.innerHTML = '<div class="sub">No tapes loaded.</div>'; return; }
+  if (searchBusy) return;
+  searchBusy = true;
+  res.innerHTML = '<div class="sub">Searching…</div>';
+  const hits = [];
+  for (let fi = 0; fi < state.folders.length; fi++) {
+    const folder = state.folders[fi];
+    let files;
+    try { files = await getTapeFiles(folder); } catch (e) { continue; }
+    files.forEach((f, ti) => {
+      if (cleanTitle(f.name).toLowerCase().includes(q)) hits.push({ fi, ti, f, folder });
+    });
+  }
+  searchBusy = false;
+  res.innerHTML = "";
+  if (!hits.length) { res.innerHTML = '<div class="sub">No tracks found on any tape.</div>'; return; }
+  hits.forEach(({ fi, ti, f, folder }) => {
+    const d = document.createElement("div");
+    d.className = "track" + (fi === state.folderIdx && ti === state.fileIdx ? " active" : "");
+    const span = document.createElement("span");
+    span.textContent = cleanTitle(f.name);
+    const len = document.createElement("span");
+    len.className = "len";
+    len.textContent = trackLen(f) ? trackLen(f) + " · " + cleanTitle(folder.name) : cleanTitle(folder.name);
+    d.appendChild(span); d.appendChild(len);
+    d.onclick = async () => {
+      $("searchOverlay").classList.add("hidden");
+      if (fi !== state.folderIdx) await loadFolder(fi, ti);
+      else await playTrack(ti);
+    };
+    res.appendChild(d);
+  });
+}
+$("btnSearch").addEventListener("click", () => {
+  $("searchOverlay").classList.remove("hidden");
+  $("searchInput").value = "";
+  doSearch("");
+  $("searchInput").focus();
+});
+$("searchInput").addEventListener("input", (e) => doSearch(e.target.value));
+$("btnCloseSearch").addEventListener("click", () => $("searchOverlay").classList.add("hidden"));
+$("searchOverlay").addEventListener("click", (e) => { if (e.target === $("searchOverlay")) $("searchOverlay").classList.add("hidden"); });
+
+$("btnSettings").addEventListener("click", () => {
+  const ov = $("setupOverlay");
+  if (ov.classList.contains("hidden")) openSetup();
+  else ov.classList.add("hidden");
+});
+function openSetup() { $("setupOverlay").classList.remove("hidden"); $("setupDetails").open = true; }
+$("btnCloseSetup").addEventListener("click", () => $("setupOverlay").classList.add("hidden"));
+$("setupOverlay").addEventListener("click", (e) => { if (e.target === $("setupOverlay")) $("setupOverlay").classList.add("hidden"); });
+$("btnDoLogin").addEventListener("click", async () => {
+  try {
+    saveSetup();
+    state.token = await getToken();
+    saveToken(state.token);
+    state.mode = "mixed";
+    begin();
+  } catch (e) { msg("Sign-in failed: " + e.message, false); }
+});
+$("btnPubOnly").addEventListener("click", () => { saveSetup(); begin(); });
+
+(function init() {
+  $("versionTag").textContent = APP_VERSION;
+  const t = CONFIG.tenant && !CONFIG.tenant.startsWith("HIER-JOUW-") ? CONFIG.tenant : "moly";
+  $("loginTenant").textContent = t;
+  document.title = t;                                   // tab title = tenant; Moly is the engine
+  const manifest = JSON.parse(decodeURIComponent(document.querySelector("link[rel=manifest]").href.replace(/^data:application\/manifest\+json,/, "")));
+  manifest.name = t; manifest.short_name = t;
+  document.querySelector("link[rel=manifest]").href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
+  const filled = ($("folderUrl").value.trim() && !$("folderUrl").value.includes("HIER-JOUW-")) ||
+                ($("publicFolderUrl").value.trim() && !$("publicFolderUrl").value.includes("HIER-JOUW-"));
+  if (filled) autoStart();
+  else { openSetup(); }
+})();
+</script>
+</body>
+</html>
