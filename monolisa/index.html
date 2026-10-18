@@ -47,6 +47,11 @@
                padding:6px 10px; margin:2px 0 8px; text-align:center;
                font-size:.95rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
                overflow-wrap:anywhere; box-shadow:0 2px 6px rgba(0,0,0,.35); }
+  .songtitle { display:block; width:100%; box-sizing:border-box; background:#ffffff;
+               color:#1d1d1f; border-radius:6px;
+               padding:5px 10px; margin:10px 0 0; text-align:center;
+               font-size:.85rem; font-weight:600; text-transform:lowercase; letter-spacing:.03em;
+               overflow-wrap:anywhere; box-shadow:0 2px 6px rgba(0,0,0,.35); }
 
   /* ---------- Cassette window ---------- */
   .cassette { position:relative; overflow:hidden;
@@ -149,9 +154,13 @@
 
   /* ---------- Small screens (iPhone): scale down, hide VU meters, fit reels ---------- */
   @media (max-width:480px) {
-    .vumeter { display:none; }               /* meters hidden: buttons get the space */
-    .reel { width:150px; height:150px; border-width:5px; }
+    .transport { flex-wrap:wrap; gap:6px; }
+    .keyrow { order:1; flex-basis:100%; }     /* buttons first, full width */
+    .vumeter { display:flex; order:2; width:70px; height:26px;
+               border-width:1px; padding:2px 3px; border-radius:5px; }  /* meters below, still live */
+    .reel { width:150px; height:150px; border-width:5px; border-radius:50%; }
     .reel .hub { width:28px; height:28px; border-width:2px; }
+    .reel .pile { transform:scale(.78); }      /* tape pile fits inside smaller reel */
     .tbtn { padding:8px 8px 7px; min-width:52px; font-size:.6rem; }
     .keyrow .tbtn { min-width:48px; }
     .tbtn .glyph { font-size:1rem; }
@@ -206,6 +215,8 @@
       <div class="reel right" id="reelR"><div class="pile" id="pileR"></div><div class="hub"></div></div>
       <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span> <button class="iconbtn" id="btnComment" title="Tap = add note at this moment · Hold = show notes">💬</button></div>
     </div>
+
+    <div class="songtitle" id="songTitle">—</div>
 
     <div class="transport">
       <div class="vumeter rev" id="vuL" title="VU left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
@@ -321,7 +332,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.23";
+const APP_VERSION = "1.24";
 
 const state = {
   apiKey: "", clientId: "",
@@ -598,6 +609,7 @@ async function playTrack(i) {
   const folder = state.folders[state.folderIdx];
   state.fileIdx = i; renderTrackList();
   updateTapePiles();
+  $("songTitle").textContent = cleanTitle(f.name).toLowerCase();
   $("trackDurWrap").textContent = trackLen(f) ? "/ " + trackLen(f) : "";
   try {
     const url = await fetchAudioUrl(f.id, folder.origin);
