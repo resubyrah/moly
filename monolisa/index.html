@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#22201c" />
 <title>Mono Lisa</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2322201c'/%3E%3Crect x='6' y='14' width='52' height='36' rx='5' fill='%23e8c46a'/%3E%3Ccircle cx='22' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='42' cy='32' r='8' fill='%23241f15'/%3E%3Ccircle cx='22' cy='32' r='3' fill='%23e8c46a'/%3E%3Ccircle cx='42' cy='32' r='3' fill='%23e8c46a'/%3E%3Crect x='14' y='48' width='36' height='4' rx='2' fill='%23241f15'/%3E%3C/svg%3E" />
 <link rel="manifest" href='data:application/manifest+json,{"name":"Moly","short_name":"Moly","display":"standalone","background_color":"%2322201c","theme_color":"%2322201c","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%2322201c%27/%3E%3Crect x=%276%27 y=%2714%27 width=%2752%27 height=%2736%27 rx=%275%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%278%27 fill=%27%23241f15%27/%3E%3Ccircle cx=%2722%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Ccircle cx=%2742%27 cy=%2732%27 r=%273%27 fill=%27%23e8c46a%27/%3E%3Crect x=%2714%27 y=%2748%27 width=%2736%27 height=%274%27 rx=%272%27 fill=%27%23241f15%27/%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}' />
@@ -44,10 +42,11 @@
   #btnLogin:disabled, #btnMode:disabled, #btnRandom:disabled { filter:grayscale(1); opacity:.15; }
   #searchResults .track { cursor:pointer; }
   #searchResults .track.active { background:rgba(232,196,106,.18); color:#8a6a10; }
-  .tapetitle { text-align:center; font-size:1.15rem; font-weight:700; color:#f5f5f7;
-               text-transform:uppercase; letter-spacing:.06em;
-               font-family:"Caveat", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
-               margin:2px 0 8px; overflow-wrap:anywhere; letter-spacing:-.01em; }
+  .tapetitle { display:inline-block; background:#ffffff; color:#1d1d1f; border-radius:6px;
+               padding:6px 14px; margin:2px auto 8px; text-align:center;
+               font-size:.95rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+               overflow-wrap:anywhere; box-shadow:0 2px 6px rgba(0,0,0,.35); }
+  .tapetitlewrap { text-align:center; }
 
   /* ---------- Cassette window ---------- */
   .cassette { position:relative; overflow:hidden;
@@ -180,7 +179,7 @@
       <button class="settingsbtn" id="btnMenu" title="Menu" style="font-size:1.4rem; padding:2px 10px">☰</button>
     </div>
 
-    <div class="tapetitle" id="tapeName">—</div>
+    <div class="tapetitlewrap"><div class="tapetitle" id="tapeName">—</div></div>
 
     <div class="cassette">
       <div class="reel" id="reelL"><div class="pile" id="pileL"></div><div class="hub"></div></div>
@@ -302,7 +301,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.19";
+const APP_VERSION = "1.20";
 
 const state = {
   apiKey: "", clientId: "",
