@@ -112,7 +112,7 @@
   .tbtn:active { background:linear-gradient(180deg,#333338 0%,#26262b 100%); }
   .tbtn .glyph { display:block; font-size:1.15rem; line-height:1.1; margin-bottom:2px; color:#ffc531; }
   .tbtn .glyph svg { display:block; width:1.15rem; height:1.15rem; margin:0 auto;
-                     stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; }
+                     stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
   .tbtn.primary { background:linear-gradient(180deg,#ffd251 0%,#f5b52e 50%,#de9d1d 100%);
                   border-color:#8a6410; color:#241a04; }
   .tbtn.primary .glyph { color:#241a04; }
@@ -161,6 +161,12 @@
 
   /* ---------- Small screens (iPhone): scale down, hide VU meters, fit reels ---------- */
   @media (max-width:480px) {
+    /* iOS: strip every trace of the default (grey gloss) button chrome */
+    .tbtn, .keyrow .tbtn, .tbtn.primary { -webkit-appearance:none; appearance:none; border:none;
+      border-right:1px solid #1a1a1d; border-radius:0; outline:none;
+      background-image:linear-gradient(180deg,#5a5a60 0%,#3f3f45 45%,#333338 55%,#4a4a50 100%); }
+    .tbtn.primary { background-image:linear-gradient(180deg,#ffd251 0%,#f5b52e 50%,#de9d1d 100%); }
+    .keyrow .tbtn:last-of-type { border-right:none; }
     /* meters stay next to the buttons, just slimmer */
     .vumeter { width:44px; height:38px; border-width:1px; padding:2px 3px; gap:1px;
                border-radius:5px; }
@@ -228,7 +234,7 @@
       <div class="vumeter rev" id="vuL" title="VU left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       <div class="keyrow">
         <button class="tbtn" id="btnPrevList" title="Previous tape"><span class="glyph">⏮</span></button>
-        <button class="tbtn" id="btnBack10" title="Back 10 seconds"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.3 4"/><path d="M5 4v5h5"/></svg></span></button>
+        <button class="tbtn" id="btnBack10" title="Back 10 seconds"><span class="glyph"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></button>
         <button class="tbtn primary" id="btnPlayPause" title="Play / pause"><span class="glyph" id="ppGlyph">⏸</span></button>
         <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph">⏭</span></button>
         <button class="tbtn" id="btnEject" title="Eject"><span class="glyph">⏏</span></button>
@@ -342,7 +348,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.28";
+const APP_VERSION = "1.29";
 
 const state = {
   apiKey: "", clientId: "",
@@ -463,7 +469,16 @@ async function driveGet(path, origin) {
     if (!state.apiKey) throw new Error("No API key configured");
     url += (path.includes("?") ? "&" : "?") + "key=" + state.apiKey;
   }
-  const r = await fetch(url, { headers });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15000);   // never hang forever
+  let r;
+  try {
+    r = await fetch(url, { headers, signal: ctrl.signal });
+  } catch (e) {
+    throw new Error("network/timeout — check connection");
+  } finally {
+    clearTimeout(timer);
+  }
   if (r.status === 401 && state.token) {
     clearToken();
     throw new Error("Session expired — please sign in again.");
@@ -579,8 +594,9 @@ async function loadFolder(idx, startAt) {
   $("brandDate").textContent = "mono lisa";   // brand name, always
   $("tapeName").textContent = cleanTitle(folder.name);    // sticker 1: folder/tape name
   // Hide at the boundaries (no dimmed buttons)
-  $("btnPrevList").classList.toggle("hidden", state.folders.length <= 1 || state.folderIdx <= 0);
-  $("btnNextList").classList.toggle("hidden", state.folders.length <= 1 || state.folderIdx >= state.folders.length - 1);
+  // Tape buttons always visible; at a boundary they simply do nothing
+  $("btnPrevList").classList.remove("hidden");
+  $("btnNextList").classList.remove("hidden");
   const files = await getTapeFiles(folder);
   state.files = files;
   renderTrackList();
@@ -644,8 +660,12 @@ function renderTrackList() {
       });
       s.addEventListener("click", (e) => e.stopPropagation());
       d.appendChild(s);
-      d.onclick = () => s.classList.toggle("hidden");              // mobile: tap the title
-      d.addEventListener("mouseenter", () => s.classList.remove("hidden"));
+      // Tap the title (not the star/time) to reveal the seek slider
+      d.onclick = (e) => {
+        if (e.target.closest && e.target.closest(".right")) return;   // star/duration: no slider
+        s.classList.toggle("hidden");
+      };
+      span.addEventListener("mouseenter", () => s.classList.remove("hidden"));   // hover the title only
       d.addEventListener("mouseleave", () => s.classList.add("hidden"));
     }
     el.appendChild(d);
@@ -1007,18 +1027,24 @@ async function doSearch(q) {
   res.innerHTML = '<div class="sub">Searching…</div>';
   try {
     const hits = [];
+    const errs = [];
     for (let fi = 0; fi < state.folders.length; fi++) {
       if (my !== searchToken) return;               // a newer query arrived
       const folder = state.folders[fi];
       let files;
-      try { files = await getTapeFiles(folder); } catch (e) { continue; }
+      try { files = await getTapeFiles(folder); }
+      catch (e) { errs.push(cleanTitle(folder.name) + ": " + (e.message || e)); continue; }
       files.forEach((f, ti) => {
         if (cleanTitle(f.name).toLowerCase().includes(q)) hits.push({ fi, ti, f, folder });
       });
     }
     if (my !== searchToken) return;
     res.innerHTML = "";
-    if (!hits.length) { res.innerHTML = '<div class="sub">No tracks found on any tape.</div>'; return; }
+    if (!hits.length) {
+      res.innerHTML = '<div class="sub">No tracks found on any tape.</div>' +
+        (errs.length ? '<div class="sub">Skipped: ' + errs.join(" · ") + '</div>' : "");
+      return;
+    }
     hits.forEach(({ fi, ti, f, folder }) => {
       const d = document.createElement("div");
       d.className = "track" + (fi === state.folderIdx && ti === state.fileIdx ? " active" : "");
