@@ -154,15 +154,14 @@
 
   /* ---------- Small screens (iPhone): scale down, hide VU meters, fit reels ---------- */
   @media (max-width:480px) {
-    .transport { flex-wrap:wrap; gap:6px; }
-    .keyrow { order:1; flex-basis:100%; }     /* buttons first, full width */
-    .vumeter { display:flex; order:2; width:70px; height:26px;
-               border-width:1px; padding:2px 3px; border-radius:5px; }  /* meters below, still live */
+    /* meters stay next to the buttons, just slimmer */
+    .vumeter { width:44px; height:38px; border-width:1px; padding:2px 3px; gap:1px;
+               border-radius:5px; }
     .reel { width:150px; height:150px; border-width:5px; border-radius:50%; }
     .reel .hub { width:28px; height:28px; border-width:2px; }
-    .reel .pile { transform:scale(.78); }      /* tape pile fits inside smaller reel */
-    .tbtn { padding:8px 8px 7px; min-width:52px; font-size:.6rem; }
-    .keyrow .tbtn { min-width:48px; }
+    .cassette { min-height:112px; }
+    .tbtn { padding:8px 6px 7px; min-width:46px; font-size:.55rem; }
+    .keyrow .tbtn { min-width:44px; }
     .tbtn .glyph { font-size:1rem; }
     .counter { font-size:.95rem; }
     .list { max-height:40vh; }
@@ -290,6 +289,9 @@
     <div class="sheet">
       <h3>🔍 Search</h3>
       <input id="searchInput" placeholder="Type (part of) a track title — searches all tapes…" autocomplete="off" />
+      <div class="row" style="margin-bottom:8px">
+        <button class="btn primary" id="btnDoSearch">SEARCH</button>
+      </div>
       <div id="searchResults" style="margin-top:10px; max-height:50vh; overflow-y:auto"></div>
       <button class="btn" id="btnCloseSearch" style="margin-top:10px">CLOSE</button>
     </div>
@@ -332,7 +334,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.24";
+const APP_VERSION = "1.26";
 
 const state = {
   apiKey: "", clientId: "",
@@ -549,6 +551,7 @@ async function getTapeFiles(folder) {
     seen.add(k);
     return true;
   });
+  files.reverse();   // after dedupe: oldest first — the tape plays in creation order
   if (!state.tapeCache) state.tapeCache = {};
   state.tapeCache[key] = files;
   return files;
@@ -667,9 +670,10 @@ function tapeProgress() {
 }
 function updateTapePiles() {
   const p = tapeProgress();
-  // Left reel starts full and empties; right reel fills. Big reels → big piles, clearly visible.
-  $("pileL").style.setProperty("--d", (56 + (1 - p) * 96) + "px");  // supply reel empties
-  $("pileR").style.setProperty("--d", (56 + p * 96) + "px");        // take-up reel fills
+  const mobile = matchMedia("(max-width:480px)").matches;
+  const base = mobile ? 44 : 56, span = mobile ? 74 : 96;   // pile fits the smaller mobile reel
+  $("pileL").style.setProperty("--d", (base + (1 - p) * span) + "px");  // supply reel empties
+  $("pileR").style.setProperty("--d", (base + p * span) + "px");        // take-up reel fills
 }
 audio.addEventListener("timeupdate", () => {
   $("trackPos").textContent = fmtTime(audio.currentTime);
@@ -931,14 +935,22 @@ $("btnMenu").addEventListener("click", () => $("menuOverlay").classList.remove("
 $("menuOverlay").addEventListener("click", (e) => { if (e.target === $("menuOverlay")) $("menuOverlay").classList.add("hidden"); });
 
 /* ---------- Search (all tapes) ---------- */
-let searchBusy = false;
+let searchQueued = null, searchRunning = false;
 async function doSearch(q) {
+  searchQueued = q;                                   // remember the latest query
+  if (searchRunning) return;                          // a run is in flight; it will pick this up
+  searchRunning = true;
+  while (searchQueued !== null) {
+    const current = searchQueued; searchQueued = null;
+    await runSearch(current);
+  }
+  searchRunning = false;
+}
+async function runSearch(q) {
   const res = $("searchResults"); res.innerHTML = "";
   q = (q || "").trim().toLowerCase();
   if (!q) { res.innerHTML = '<div class="sub">Type at least one character…</div>'; return; }
   if (!state.folders.length) { res.innerHTML = '<div class="sub">No tapes loaded.</div>'; return; }
-  if (searchBusy) return;
-  searchBusy = true;
   res.innerHTML = '<div class="sub">Searching…</div>';
   const hits = [];
   for (let fi = 0; fi < state.folders.length; fi++) {
@@ -949,7 +961,7 @@ async function doSearch(q) {
       if (cleanTitle(f.name).toLowerCase().includes(q)) hits.push({ fi, ti, f, folder });
     });
   }
-  searchBusy = false;
+  if (searchQueued !== null) return;                  // a newer query arrived; render that one
   res.innerHTML = "";
   if (!hits.length) { res.innerHTML = '<div class="sub">No tracks found on any tape.</div>'; return; }
   hits.forEach(({ fi, ti, f, folder }) => {
@@ -976,6 +988,8 @@ $("btnSearch").addEventListener("click", () => {
   $("searchInput").focus();
 });
 $("searchInput").addEventListener("input", (e) => doSearch(e.target.value));
+$("searchInput").addEventListener("keydown", (e) => { if (e.key === "Enter") doSearch(e.target.value); });
+$("btnDoSearch").addEventListener("click", () => doSearch($("searchInput").value));
 $("btnCloseSearch").addEventListener("click", () => $("searchOverlay").classList.add("hidden"));
 $("searchOverlay").addEventListener("click", (e) => { if (e.target === $("searchOverlay")) $("searchOverlay").classList.add("hidden"); });
 
