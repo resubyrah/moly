@@ -55,17 +55,17 @@
                overflow-wrap:anywhere; box-shadow:0 2px 6px rgba(0,0,0,.35); }
 
   /* ---------- Cassette window ---------- */
-  .cassette { position:relative; overflow:hidden;
+  .cassette { --rd:190px; position:relative; overflow:hidden;
               background:linear-gradient(180deg,#ff6a45 0%,#f4472b 55%,#d63a20 100%);
               border-radius:12px; padding:10px 14px 10px; min-height:142px;
               box-shadow:inset 0 2px 8px rgba(0,0,0,.45), inset 0 -2px 8px rgba(0,0,0,.35);
               border:3px solid #b02e10; outline:1px solid #000; }
   .cassette > * { position:relative; z-index:5; }
-  .reel { position:absolute; top:50%; left:25%; z-index:1;
-          transform:translate(-50%,-50%); width:190px; height:190px; border-radius:50%;
+  .reel { position:absolute; top:50%; left:calc((100% - 2*var(--rd))/3 + var(--rd)/2); z-index:1;
+          transform:translate(-50%,-50%); width:var(--rd); height:var(--rd); border-radius:50%;
           background:radial-gradient(circle,#ddd4c4 0%,#c4baa6 45%,#a2977f 100%);
           border:7px solid #1a1a1d; box-shadow:0 2px 8px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.18); }
-  .reel.right { left:75%; }
+  .reel.right { left:auto; right:calc((100% - 2*var(--rd))/3 - var(--rd)/2); }  /* compensate translate(-50%) */
   .spin { animation:spin 3.2s linear infinite; }
   @keyframes spin {
     from { transform:translate(-50%,-50%) rotate(0deg); }
@@ -111,8 +111,10 @@
           box-shadow:inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.5); }
   .tbtn:active { background:linear-gradient(180deg,#333338 0%,#26262b 100%); }
   .tbtn .glyph { display:block; font-size:1.15rem; line-height:1.1; margin-bottom:2px; color:#ffc531; }
-  .tbtn .glyph svg { display:block; width:1.15rem; height:1.15rem; margin:0 auto;
-                     stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+  .tbtn .glyph svg { display:block; width:1.3rem; height:1.3rem; margin:0 auto;
+                     stroke:currentColor; fill:currentColor; stroke-width:1.6;
+                     stroke-linecap:round; stroke-linejoin:round; }
+  .tbtn.dim .glyph { opacity:.45; }   /* inactive of the play/pause pair */
   .tbtn.primary { background:linear-gradient(180deg,#ffd251 0%,#f5b52e 50%,#de9d1d 100%);
                   border-color:#8a6410; color:#241a04; }
   .tbtn.primary .glyph { color:#241a04; }
@@ -152,7 +154,9 @@
   .track.active { background:rgba(232,196,106,.22); color:#7a5c0e; font-weight:600; }
   .track .len { color:#86868b; font-variant-numeric:tabular-nums; white-space:nowrap; }
   .track .right { display:flex; align-items:center; gap:7px; white-space:nowrap; }
-  .track .star { cursor:pointer; color:#c9c9cf; font-size:1rem; line-height:1; }
+  .track .star { cursor:pointer; color:#c9c9cf; font-size:1.15rem; line-height:1;
+                 padding:8px 10px; margin:-8px -6px; }   /* big tap target on mobile */
+  .track .star:active { opacity:.5; }
   .track .star.mine { color:#ffc531; text-shadow:0 0 5px rgba(255,197,49,.6); }
   .track .star.other { color:#ffffff; text-shadow:0 1px 3px rgba(0,0,0,.35); }
   .minislider { position:absolute; left:10px; right:10px; bottom:-3px; width:calc(100% - 20px);
@@ -171,6 +175,7 @@
     .vumeter { width:44px; height:38px; border-width:1px; padding:2px 3px; gap:1px;
                border-radius:5px; }
     .reel { width:150px; height:150px; border-width:5px; border-radius:50%; }
+    .cassette { --rd:150px; }
     .reel .hub { width:28px; height:28px; border-width:2px; }
     .cassette { min-height:112px; }
     .tbtn { padding:8px 6px 7px; min-width:46px; font-size:.55rem; }
@@ -233,11 +238,12 @@
     <div class="transport">
       <div class="vumeter rev" id="vuL" title="VU left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       <div class="keyrow">
-        <button class="tbtn" id="btnPrevList" title="Previous tape"><span class="glyph">⏮</span></button>
-        <button class="tbtn" id="btnBack10" title="Back 10 seconds"><span class="glyph"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></button>
-        <button class="tbtn primary" id="btnPlayPause" title="Play / pause"><span class="glyph" id="ppGlyph">⏸</span></button>
-        <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph">⏭</span></button>
-        <button class="tbtn" id="btnEject" title="Eject"><span class="glyph">⏏</span></button>
+        <button class="tbtn" id="btnPrevList" title="Previous tape"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M19 5v14L8.5 12 19 5z"/><rect x="5" y="5" width="2.4" height="14"/></svg></span></button>
+        <button class="tbtn" id="btnBack10" title="Back 10 seconds"><span class="glyph"><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></button>
+        <button class="tbtn primary" id="btnPlay" title="Play"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M7 4.5v15L20 12 7 4.5z"/></svg></span></button>
+        <button class="tbtn primary" id="btnPause" title="Pause"><span class="glyph"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg></span></button>
+        <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M5 5v14l10.5-7L5 5z"/><rect x="16.6" y="5" width="2.4" height="14"/></svg></span></button>
+        <button class="tbtn" id="btnEject" title="Eject"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M12 5l7 8H5l7-8z"/><rect x="5" y="16" width="14" height="2.6"/></svg></span></button>
       </div>
       <div class="vumeter" id="vuR" title="VU right"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
     </div>
@@ -348,7 +354,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.29";
+const APP_VERSION = "1.31";
 
 const state = {
   apiKey: "", clientId: "",
@@ -610,7 +616,15 @@ async function loadFolder(idx, startAt) {
 }
 function starKey(f) { return cleanTitle(f.name).toLowerCase(); }
 async function toggleStar(f) {
-  if (!state.token || !state.email) { msg("Sign in to star versions.", false); return; }
+  if (!state.token) { msg("Sign in to star versions.", false); return; }
+  if (!state.email) {                                  // fetch email lazily once
+    try {
+      const u = await (await fetch("https://www.googleapis.com/oauth2/v3/userinfo",
+        { headers: { Authorization: "Bearer " + state.token } })).json();
+      if (u.email) { state.email = u.email; localStorage.setItem("mlEmail", u.email); }
+    } catch (e) { /* fall through */ }
+  }
+  if (!state.email) { msg("Could not identify your account — try signing in again.", false); return; }
   const key = starKey(f);
   const arr = state.stars[key] || [];
   const i = arr.indexOf(state.email);
@@ -711,7 +725,8 @@ async function fetchAudioUrl(fileId, origin) {
 }
 function setPlaying(p) {
   if (state.fileIdx < 0) return;
-  $("ppGlyph").textContent = p ? "⏸" : "▶";
+  $("btnPlay").classList.toggle("dim", p);     // playing: play button dims
+  $("btnPause").classList.toggle("dim", !p);   // paused: pause button dims
   document.querySelectorAll(".reel").forEach((r) => r.classList.toggle("spin", p));
 }
 audio.addEventListener("ended", () => {
@@ -771,11 +786,8 @@ function updateMediaSession() {
   });
   try { navigator.mediaSession.setActionHandler("seekto", (d) => { if (d.seekTime != null) audio.currentTime = d.seekTime; }); } catch (e) {}
 }
-$("btnPlayPause").addEventListener("click", () => {
-  if (!audio.src) return;
-  if (audio.paused) { audio.play(); setPlaying(true); }
-  else { audio.pause(); setPlaying(false); }
-});
+$("btnPlay").addEventListener("click", () => { if (!audio.src) return; if (audio.paused) { audio.play(); setPlaying(true); } });
+$("btnPause").addEventListener("click", () => { if (!audio.src) return; if (!audio.paused) { audio.pause(); setPlaying(false); } });
 $("btnBack10").addEventListener("click", () => audio.currentTime = Math.max(0, audio.currentTime - 10));
 $("btnEject").addEventListener("click", () => {
   audio.pause(); setPlaying(false);
@@ -1028,9 +1040,12 @@ async function doSearch(q) {
   try {
     const hits = [];
     const errs = [];
+    const pub = !state.token || state.mode === "public";
     for (let fi = 0; fi < state.folders.length; fi++) {
       if (my !== searchToken) return;               // a newer query arrived
       const folder = state.folders[fi];
+      if (pub && folder.origin !== "pub") continue;      // public mode: only public tapes
+      if (!pub && folder.origin !== "priv") continue;   // private mode: only private tapes
       let files;
       try { files = await getTapeFiles(folder); }
       catch (e) { errs.push(cleanTitle(folder.name) + ": " + (e.message || e)); continue; }
