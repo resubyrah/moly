@@ -239,7 +239,7 @@
       <div class="vumeter rev" id="vuL" title="VU left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       <div class="keyrow">
         <button class="tbtn" id="btnPrevList" title="Previous tape"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M19 5v14L8.5 12 19 5z"/><rect x="5" y="5" width="2.4" height="14"/></svg></span></button>
-        <button class="tbtn" id="btnBack10" title="Back 10 seconds"><span class="glyph"><svg viewBox="0 0 24 24" style="transform:scaleX(-1)"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></button>
+        <button class="tbtn" id="btnBack10" title="Back 10 seconds"><span class="glyph"><svg viewBox="0 0 24 24" style="transform:scaleX(-1); fill:none; stroke:currentColor; stroke-width:2.4"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span></button>
         <button class="tbtn primary" id="btnPlay" title="Play"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M7 4.5v15L20 12 7 4.5z"/></svg></span></button>
         <button class="tbtn primary" id="btnPause" title="Pause"><span class="glyph"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg></span></button>
         <button class="tbtn" id="btnNextList" title="Next tape"><span class="glyph"><svg viewBox="0 0 24 24"><path d="M5 5v14l10.5-7L5 5z"/><rect x="16.6" y="5" width="2.4" height="14"/></svg></span></button>
@@ -354,7 +354,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.31";
+const APP_VERSION = "1.32";
 
 const state = {
   apiKey: "", clientId: "",
@@ -619,12 +619,16 @@ async function toggleStar(f) {
   if (!state.token) { msg("Sign in to star versions.", false); return; }
   if (!state.email) {                                  // fetch email lazily once
     try {
-      const u = await (await fetch("https://www.googleapis.com/oauth2/v3/userinfo",
+      let u = await (await fetch("https://www.googleapis.com/oauth2/v3/userinfo",
         { headers: { Authorization: "Bearer " + state.token } })).json();
+      if (!u.email) {   // fallback: tokeninfo endpoint
+        u = await (await fetch("https://oauth2.googleapis.com/tokeninfo?access_token=" +
+          encodeURIComponent(state.token))).json();
+      }
       if (u.email) { state.email = u.email; localStorage.setItem("mlEmail", u.email); }
     } catch (e) { /* fall through */ }
   }
-  if (!state.email) { msg("Could not identify your account — try signing in again.", false); return; }
+  if (!state.email) { msg("Account check failed — sign out and sign in again (once) to grant the new permission.", false); return; }
   const key = starKey(f);
   const arr = state.stars[key] || [];
   const i = arr.indexOf(state.email);
@@ -987,7 +991,7 @@ function getToken() {
     const use = () => {
       const client = window.google.accounts.oauth2.initTokenClient({
         client_id: state.clientId,
-        scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file",
+        scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email",
         callback: (r) => r.access_token ? resolve(r.access_token) : reject(new Error("no token received")),
       });
       client.requestAccessToken({ prompt: "" }); // silent reuse of earlier consent when possible
