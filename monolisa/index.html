@@ -53,8 +53,10 @@
                padding:5px 10px; margin:10px 0 0; text-align:center;
                font-size:.85rem; font-weight:600; text-transform:lowercase; letter-spacing:.03em;
                overflow-wrap:anywhere; box-shadow:0 2px 6px rgba(0,0,0,.35); }
-
-  /* ---------- Cassette window ---------- */
+  .tapetitle { cursor:pointer; }
+  .noterow { display:flex; gap:8px; align-items:center; }
+  .noterow input { flex:1; margin-bottom:0; }
+  .notesbox { margin-top:10px; border-top:1px solid #e8e8ed; padding-top:10px; }  /* ---------- Cassette window ---------- */
   .cassette { --rd:190px; position:relative; overflow:hidden;
               background:linear-gradient(180deg,#ff6a45 0%,#f4472b 55%,#d63a20 100%);
               border-radius:12px; padding:10px 14px 10px; min-height:142px;
@@ -225,12 +227,12 @@
       <button class="settingsbtn" id="btnMenu" title="Menu" style="font-size:1.4rem; padding:2px 10px">☰</button>
     </div>
 
-    <div class="tapetitlewrap" style="width:100%"><div class="tapetitle" id="tapeName">—</div></div>
+    <div class="tapetitlewrap" style="width:100%"><div class="tapetitle" id="tapeName" title="Tap to choose a tape">—</div></div>
 
     <div class="cassette">
       <div class="reel" id="reelL"><div class="pile" id="pileL"></div><div class="hub"></div></div>
       <div class="reel right" id="reelR"><div class="pile" id="pileR"></div><div class="hub"></div></div>
-      <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span> <button class="iconbtn" id="btnComment" title="Tap = add note at this moment · Hold = show notes">💬</button></div>
+      <div class="counter"><span id="trackPos">0:00</span> <span class="dur" id="trackDurWrap"></span></div>
     </div>
 
     <div class="songtitle" id="songTitle">—</div>
@@ -264,9 +266,28 @@
     </div>
   </div>
 
-  <!-- Tracklist in its own chassis, outside the deck -->
+  <!-- Tracklist + notes in their own chassis, outside the deck -->
   <div class="tapebox">
     <div class="list" id="trackList"></div>
+    <div class="notesbox" id="notesBox">
+      <div class="noterow">
+        <input id="noteInput" placeholder="Note at current time… (tap ↵ to save)" autocomplete="off" />
+        <button class="btn primary" id="btnAddNote" style="margin-bottom:0">NOTE</button>
+      </div>
+      <div class="noterow" style="justify-content:space-between; margin:8px 0 2px">
+        <span class="sub" style="margin:0">notes <span id="listCount"></span></span>
+        <button class="smallbtn" id="btnSortNotes">↓ newest first</button>
+      </div>
+      <div id="commentList" style="max-height:30vh; overflow:auto"></div>
+    </div>
+  </div>
+
+  <!-- Tape picker -->
+  <div class="overlay hidden" id="tapeOverlay">
+    <div class="sheet">
+      <h3>Choose a tape</h3>
+      <div id="tapePickList"></div>
+    </div>
   </div>
 
   <!-- Settings modal -->
@@ -317,28 +338,6 @@
     </div>
   </div>
 
-  <!-- Note input -->
-  <div class="overlay hidden" id="inputOverlay">
-    <div class="sheet">
-      <h3>Note</h3>
-      <div class="sub" id="inputAt">at 0:00</div>
-      <input id="commentText" placeholder="Your note at this moment..." />
-      <div class="row">
-        <button class="btn primary" id="btnSaveComment">SAVE</button>
-        <button class="btn" id="btnCancelComment">CANCEL</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notes overview -->
-  <div class="overlay hidden" id="listOverlay">
-    <div class="sheet">
-      <h3>Notes <span class="sub" id="listCount"></span></h3>
-      <div id="commentList"></div>
-      <button class="btn" id="btnCloseList" style="margin-top:10px">CLOSE</button>
-    </div>
-  </div>
-
 <script>
 "use strict";
 const $ = (id) => document.getElementById(id);
@@ -354,7 +353,7 @@ const CONFIG = {
   clientId:         "513652605614-a84dqbd2n2h0b8nj5p4o0sp8b7ar6gtl.apps.googleusercontent.com",
 };
 
-const APP_VERSION = "1.32";
+const APP_VERSION = "1.33";
 
 const state = {
   apiKey: "", clientId: "",
@@ -508,7 +507,7 @@ function readConfigInputs() {
   state.pubRoot = parseFolderId($("publicFolderUrl").value);
 }
 function updateBalloon() {
-  $("btnComment").classList.toggle("hidden", !(state.token && state.mode !== "public"));
+  $("notesBox").classList.toggle("hidden", !(state.token && state.mode !== "public"));
   const pub = !state.token || state.mode === "public";
   const m = $("btnMode"), k = $("btnLogin");
   m.classList.toggle("active", pub);              // globe on = public tapes
@@ -696,13 +695,15 @@ async function playTrack(i) {
   const folder = state.folders[state.folderIdx];
   state.fileIdx = i; renderTrackList();
   updateTapePiles();
-  $("songTitle").textContent = cleanTitle(f.name).toLowerCase();
+  $("songTitle").textContent = "⏳ loading…";
+  const folder0 = state.folders[state.folderIdx];
   $("trackDurWrap").textContent = trackLen(f) ? "/ " + trackLen(f) : "";
   try {
     const url = await fetchAudioUrl(f.id, folder.origin);
     audio.src = url;
     await audio.play();
     setPlaying(true);
+    $("songTitle").textContent = cleanTitle(f.name).toLowerCase();
     updateMediaSession();
   } catch (e) {
     setPlaying(false);
@@ -798,14 +799,11 @@ $("btnEject").addEventListener("click", () => {
   audio.currentTime = 0;
   msg("⏏ Bye", true);
 });
-$("btnPrevList").addEventListener("click", () => stepTape(-1));
-$("btnNextList").addEventListener("click", () => stepTape(1));
+$("btnPrevList").addEventListener("click", () => { if (state.fileIdx > 0) playTrack(state.fileIdx - 1); });
+$("btnNextList").addEventListener("click", () => { if (state.fileIdx < state.files.length - 1) playTrack(state.fileIdx + 1); });
 async function stepTape(dir) {
-  // Meerdere tapes: wissel van tape. Eén tape: gebruik als vorige/volgende nummer.
-  if (state.folders.length > 1) return loadFolder(state.folderIdx + dir);
-  if (state.files.length < 2) return;
-  const next = state.fileIdx + dir;
-  if (next >= 0 && next < state.files.length) await playTrack(next);
+  if (state.folderIdx + dir < 0 || state.folderIdx + dir >= state.folders.length) return;
+  return loadFolder(state.folderIdx + dir);
 }
 
 /* ---------- VU meter (true stereo: splitter + 2 analysers) ---------- */
@@ -905,52 +903,56 @@ function renderComments(currentSec) {
   $("listCount").textContent = "(" + state.comments.length + ")";
   let hlIdx = -1;
   if (currentSec != null) state.comments.forEach((c, i) => { if (c.sec <= currentSec) hlIdx = i; });
-  state.comments.forEach((c, i) => {
+  const arr = state.comments.slice().sort((a, b) => state.notesDesc ? b.sec - a.sec : a.sec - b.sec);
+  arr.forEach((c) => {
     const d = document.createElement("div");
-    d.className = "comment" + (i === hlIdx ? " hl" : "");
+    d.className = "comment" + (state.comments.indexOf(c) === hlIdx ? " hl" : "");
     d.innerHTML = "<span class='ts'>[" + fmtTime(c.sec) + "]</span>" + c.text.replace(/[<>&]/g, (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[ch]));
     wrap.appendChild(d);
   });
   if (!state.comments.length) wrap.innerHTML = "<div class='sub'>No notes in this tape yet.</div>";
 }
-let holdTimer = null, held = false;
-const balloon = $("btnComment");
-balloon.addEventListener("pointerdown", () => {
-  held = false;
-  holdTimer = setTimeout(() => { held = true; openCommentList(); }, 450);
+/* ---------- Tape picker (tap the tape title sticker) ---------- */
+$("tapeName").addEventListener("click", () => {
+  const box = $("tapePickList"); box.innerHTML = "";
+  state.folders.forEach((folder, i) => {
+    const d = document.createElement("div");
+    d.className = "track" + (i === state.folderIdx ? " active" : "");
+    const name = document.createElement("span");
+    name.textContent = cleanTitle(folder.name);
+    const org = document.createElement("span");
+    org.className = "len";
+    org.textContent = folder.origin === "pub" ? "public" : "private";
+    d.appendChild(name); d.appendChild(org);
+    d.onclick = () => { $("tapeOverlay").classList.add("hidden"); if (i !== state.folderIdx) loadFolder(i, 0); };
+    box.appendChild(d);
+  });
+  $("tapeOverlay").classList.remove("hidden");
 });
-["pointerup", "pointerleave"].forEach((ev) => balloon.addEventListener(ev, () => clearTimeout(holdTimer)));
-balloon.addEventListener("click", () => { if (!held) openCommentInput(); });
-function openCommentInput() {
-  if (!audio.src) return;
-  $("inputAt").textContent = "at " + fmtTime(audio.currentTime) + " in " +
-    (state.files[state.fileIdx] ? cleanTitle(state.files[state.fileIdx].name) : "");
-  $("commentText").value = "";
-  $("inputOverlay").classList.remove("hidden");
-  setTimeout(() => $("commentText").focus(), 50);
-}
-function openCommentList() {
-  renderComments(audio.currentTime || null);
-  $("listOverlay").classList.remove("hidden");
-}
-$("btnCancelComment").addEventListener("click", () => $("inputOverlay").classList.add("hidden"));
-$("btnCloseList").addEventListener("click", () => $("listOverlay").classList.add("hidden"));
-[$("inputOverlay"), $("listOverlay")].forEach((ov) => ov.addEventListener("click", (e) => { if (e.target === ov) ov.classList.add("hidden"); }));
-$("btnSaveComment").addEventListener("click", saveComment);
-$("commentText").addEventListener("keydown", (e) => { if (e.key === "Enter") saveComment(); });
-async function saveComment() {
-  const text = $("commentText").value.trim();
-  if (!text) return $("inputOverlay").classList.add("hidden");
+$("tapeOverlay").addEventListener("click", (e) => { if (e.target === $("tapeOverlay")) $("tapeOverlay").classList.add("hidden"); });
+
+/* Notes panel below the playlist */
+state.notesDesc = true;                                   // default: newest first
+$("btnSortNotes").addEventListener("click", () => {
+  state.notesDesc = !state.notesDesc;
+  $("btnSortNotes").textContent = state.notesDesc ? "↓ newest first" : "↑ oldest first";
+  renderComments(null);
+});
+function saveComment() {
+  const el = $("noteInput");
+  const text = el.value.trim();
+  if (!text) return;
   const folder = state.folders[state.folderIdx];
+  if (!folder) return;
   state.comments.push({ sec: Math.floor(audio.currentTime), text });
   state.comments.sort((a, b) => a.sec - b.sec);
-  $("inputOverlay").classList.add("hidden");
+  el.value = "";
   renderComments(audio.currentTime);
-  if (!state.token) {
-    alert("To save notes to Drive you need to sign in first (LOG IN button).\nThe note is kept on this device only for now.");
-  }
-  await persistComments(folder);
+  if (!state.token) msg("Saved on this device — sign in to save notes to Drive.", true);
+  return persistComments(folder);
 }
+$("btnAddNote").addEventListener("click", saveComment);
+$("noteInput").addEventListener("keydown", (e) => { if (e.key === "Enter") saveComment(); });
 async function persistComments(folder) {
   const md = commentsAsMd();
   if (!state.token) return localStorage.setItem("mlComments_" + folder.id, md);
